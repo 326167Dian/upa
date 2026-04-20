@@ -60,6 +60,15 @@
             display: none;
         }
 
+        .side-nav .logo .sidebar-brand {
+            display: block;
+            width: auto;
+            max-width: 100%;
+            max-height: 64px;
+            margin: 0 auto;
+            object-fit: contain;
+        }
+
         @media only screen and (min-width: 992px) {
             .vertical-layout {
                 --desktop-sidebar-width: 250px;
@@ -195,7 +204,7 @@
             <div class="side-nav vertical-menu nav-menu-light scrollable auto-hide-ready" id="app-sidebar">
                 <div class="nav-logo">
                     <div class="w-100 logo">
-                        <img class="img-fluid" src="{{ $espireAsset('images/logo/logo.png') }}" style="max-height: 70px;" alt="logo">
+                        <img class="img-fluid sidebar-brand" src="{{ asset('logo.png') }}" alt="Logo UPA">
                     </div>
                     <div class="mobile-close">
                         <i class="icon-arrow-left feather"></i>
