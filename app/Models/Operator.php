@@ -11,9 +11,15 @@ class Operator extends Model
     protected $fillable = [
         'user_id',
         'name',
+        'username',
+        'password',
         'role',
         'phone_number',
         'full_address',
+    ];
+
+    protected $hidden = [
+        'password',
     ];
 
     public function user(): BelongsTo

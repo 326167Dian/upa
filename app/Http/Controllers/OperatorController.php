@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Operator;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class OperatorController extends Controller
@@ -21,6 +26,7 @@ class OperatorController extends Controller
                     $query->where(function (Builder $nestedQuery) use ($search) {
                         $nestedQuery
                             ->where('name', 'like', '%'.$search.'%')
+                            ->orWhere('username', 'like', '%'.$search.'%')
                             ->orWhere('phone_number', 'like', '%'.$search.'%')
                             ->orWhere('full_address', 'like', '%'.$search.'%');
                     });
@@ -47,8 +53,16 @@ class OperatorController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validatedData($request);
+        DB::transaction(function () use ($data): void {
+            $passwordHash = Hash::make($data['password']);
+            $user = $this->upsertOperatorUser($data, null, $passwordHash);
 
-        Operator::create($data);
+            Operator::create([
+                ...Arr::except($data, ['password']),
+                'user_id' => $user->id,
+                'password' => $passwordHash,
+            ]);
+        });
 
         return redirect()
             ->route('operators.index')
@@ -64,7 +78,21 @@ class OperatorController extends Controller
 
     public function update(Request $request, Operator $operator): RedirectResponse
     {
-        $operator->update($this->validatedData($request));
+        $data = $this->validatedData($request, $operator);
+
+        DB::transaction(function () use ($data, $operator): void {
+            $passwordHash = filled($data['password'] ?? null)
+                ? Hash::make($data['password'])
+                : $operator->password;
+
+            $user = $this->upsertOperatorUser($data, $operator, $passwordHash);
+
+            $operator->update([
+                ...Arr::except($data, ['password']),
+                'user_id' => $user->id,
+                'password' => $passwordHash,
+            ]);
+        });
 
         return redirect()
             ->route('operators.index')
@@ -79,7 +107,13 @@ class OperatorController extends Controller
                 ->with('error', 'Hanya admin yang dapat menghapus data operator.');
         }
 
-        $operator->delete();
+        DB::transaction(function () use ($operator): void {
+            $linkedUser = $operator->user;
+
+            $operator->delete();
+
+            $linkedUser?->delete();
+        });
 
         return redirect()
             ->route('operators.index')
@@ -87,15 +121,50 @@ class OperatorController extends Controller
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
-    protected function validatedData(Request $request): array
+    protected function validatedData(Request $request, ?Operator $operator = null): array
     {
+        $passwordRule = $operator && filled($operator->password) ? 'nullable' : 'required';
+
         return $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('operators', 'username')->ignore($operator?->id),
+                Rule::unique('users', 'username')->ignore($operator?->user_id),
+            ],
+            'password' => [$passwordRule, 'string', 'min:8'],
             'role' => ['required', 'in:admin,user'],
             'phone_number' => ['required', 'string', 'max:30'],
             'full_address' => ['required', 'string'],
         ]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function upsertOperatorUser(array $data, ?Operator $operator, string $passwordHash): User
+    {
+        $user = $operator?->user ?? new User();
+
+        $user->fill([
+            'name' => $data['name'],
+            'username' => $data['username'],
+            'role' => $data['role'],
+            'email' => $this->operatorEmail((string) $data['username']),
+            'password' => $passwordHash,
+        ]);
+
+        $user->save();
+
+        return $user;
+    }
+
+    protected function operatorEmail(string $username): string
+    {
+        return strtolower($username).'@upa.local';
     }
 }

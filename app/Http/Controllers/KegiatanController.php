@@ -83,6 +83,8 @@ class KegiatanController extends Controller
             'user_id' => $user->id,
         ], [
             'name' => $user->name,
+            'username' => $user->username,
+            'password' => $user->password,
             'role' => $user->role,
             'phone_number' => '-',
             'full_address' => 'Belum diisi',

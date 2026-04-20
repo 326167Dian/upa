@@ -20,7 +20,7 @@
                             type="text"
                             class="form-control"
                             value="{{ $filters['search'] }}"
-                            placeholder="Cari nama, no telp, atau alamat"
+                            placeholder="Cari nama, username, no telp, atau alamat"
                         >
                     </div>
                     <div class="col-md-4">
@@ -44,6 +44,7 @@
                         <thead>
                             <tr>
                                 <th>Nama</th>
+                                <th>Username</th>
                                 <th>Role</th>
                                 <th>No Telp</th>
                                 <th>Alamat Lengkap</th>
@@ -54,6 +55,7 @@
                             @forelse ($operators as $operator)
                                 <tr>
                                     <td>{{ $operator->name }}</td>
+                                    <td>{{ $operator->username ?? '-' }}</td>
                                     <td><span class="badge bg-info text-dark text-uppercase">{{ $operator->role }}</span></td>
                                     <td>{{ $operator->phone_number }}</td>
                                     <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($operator->full_address)), 90) }}</td>
@@ -70,7 +72,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">Belum ada data operator.</td>
+                                    <td colspan="6" class="text-center text-muted">Belum ada data operator.</td>
                                 </tr>
                             @endforelse
                         </tbody>

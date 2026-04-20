@@ -18,6 +18,25 @@
 
     <div class="col-md-6">
         <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input
+                id="username"
+                name="username"
+                type="text"
+                class="form-control @error('username') is-invalid @enderror"
+                value="{{ old('username', $operator->username) }}"
+                placeholder="Masukkan username login"
+            >
+            @error('username')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
             <label for="role" class="form-label">Role</label>
             <select id="role" name="role" class="form-control @error('role') is-invalid @enderror">
                 <option value="">Pilih role</option>
@@ -25,6 +44,22 @@
                 <option value="user" @selected(old('role', $operator->role) === 'user')>User</option>
             </select>
             @error('role')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+                id="password"
+                name="password"
+                type="password"
+                class="form-control @error('password') is-invalid @enderror"
+                placeholder="{{ $operator->exists ? 'Kosongkan jika tidak diubah' : 'Masukkan password login' }}"
+            >
+            @error('password')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>

@@ -8,6 +8,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -38,6 +39,8 @@ class DatabaseSeeder extends Seeder
             'user_id' => $adminUser->id,
         ], [
             'name' => 'mysifa',
+            'username' => 'mysifa',
+            'password' => $adminUser->password,
             'role' => 'admin',
             'phone_number' => '081200000001',
             'full_address' => 'Jl. Admin Utama No. 1, Jakarta',
@@ -47,6 +50,8 @@ class DatabaseSeeder extends Seeder
             'user_id' => $userAccount->id,
         ], [
             'name' => 'Operator User',
+            'username' => 'operatoruser',
+            'password' => $userAccount->password,
             'role' => 'user',
             'phone_number' => '081200000002',
             'full_address' => 'Jl. Operator User No. 2, Bandung',
@@ -72,10 +77,24 @@ class DatabaseSeeder extends Seeder
                 'full_address' => 'Jl. Flamboyan No. 8, Surabaya',
             ],
         ] as $operator) {
-            Operator::updateOrCreate([
-                'user_id' => null,
+            $username = Str::slug($operator['name'], '') ?: 'operator'.Str::random(6);
+
+            $user = User::updateOrCreate([
+                'username' => $username,
+            ], [
                 'name' => $operator['name'],
-            ], $operator);
+                'role' => $operator['role'],
+                'email' => $username.'@upa.local',
+                'password' => Hash::make('326167Dian&&'),
+            ]);
+
+            Operator::updateOrCreate([
+                'user_id' => $user->id,
+            ], [
+                ...$operator,
+                'username' => $username,
+                'password' => $user->password,
+            ]);
         }
 
         foreach ([
