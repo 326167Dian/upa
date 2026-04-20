@@ -14,6 +14,10 @@
     <link href="{{ $espireAsset('vendors/apexcharts/dist/apexcharts.css') }}" rel="stylesheet">
     <link href="{{ $espireAsset('css/app.min.css') }}" rel="stylesheet">
     <style>
+        .vertical-layout {
+            position: relative;
+        }
+
         .content-shell {
             min-height: 100vh;
             background: #edf4f9;
@@ -52,13 +56,82 @@
             padding-left: 1.25rem;
         }
 
+        .desktop-sidebar-toggle {
+            display: none;
+        }
+
         @media only screen and (min-width: 992px) {
-            .side-nav.auto-hide-ready {
-                transition: width 0.2s ease;
+            .vertical-layout {
+                --desktop-sidebar-width: 250px;
             }
 
             .content-shell .main {
                 padding: 1.5625rem;
+            }
+
+            .side-nav.auto-hide-ready {
+                width: var(--desktop-sidebar-width);
+                transition: width 0.3s ease, box-shadow 0.3s ease;
+                overflow: hidden;
+            }
+
+            #app-header,
+            #app-content {
+                transition: all 0.3s ease;
+            }
+
+            .desktop-sidebar-toggle {
+                position: fixed;
+                top: 50%;
+                left: calc(var(--desktop-sidebar-width) - 1px);
+                transform: translateY(-50%);
+                z-index: 1100;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 28px;
+                height: 72px;
+                padding: 0;
+                border: 1px solid #d7e2ec;
+                border-left: 0;
+                border-radius: 0 14px 14px 0;
+                background: #ffffff;
+                color: #4a5a6a;
+                box-shadow: 10px 0 30px rgba(16, 24, 40, 0.08);
+                cursor: pointer;
+                transition: left 0.3s ease, background-color 0.2s ease, color 0.2s ease;
+            }
+
+            .desktop-sidebar-toggle:hover {
+                background: #f3f7fb;
+                color: #1f6feb;
+            }
+
+            .desktop-sidebar-toggle span {
+                font-size: 1rem;
+                line-height: 1;
+            }
+
+            body.sidebar-collapsed #app-sidebar {
+                width: 0 !important;
+                box-shadow: none;
+            }
+
+            body.sidebar-collapsed #app-header,
+            body.sidebar-collapsed #app-content {
+                left: 0 !important;
+                width: 100% !important;
+                margin-left: 0 !important;
+            }
+
+            body.sidebar-collapsed .desktop-sidebar-toggle {
+                left: 0;
+            }
+        }
+
+        @media only screen and (max-width: 991.98px) {
+            .desktop-sidebar-toggle {
+                display: none !important;
             }
         }
     </style>
@@ -66,7 +139,7 @@
 <body>
     <div class="layout">
         <div class="vertical-layout">
-            <div class="header-text-dark header-nav layout-vertical is-collapse" id="app-header">
+            <div class="header-text-dark header-nav layout-vertical" id="app-header">
                 <div class="header-nav-wrap">
                     <div class="header-nav-left">
                         <div class="header-nav-item desktop-toggle">
@@ -119,7 +192,7 @@
                 </div>
             </div>
 
-            <div class="side-nav vertical-menu nav-menu-light scrollable nav-menu-collapse auto-hide-ready" id="app-sidebar">
+            <div class="side-nav vertical-menu nav-menu-light scrollable auto-hide-ready" id="app-sidebar">
                 <div class="nav-logo">
                     <div class="w-100 logo">
                         <img class="img-fluid" src="{{ $espireAsset('images/logo/logo.png') }}" style="max-height: 70px;" alt="logo">
@@ -156,7 +229,11 @@
                 </ul>
             </div>
 
-            <div class="content is-collapse content-shell" id="app-content">
+            <button id="sidebar-toggle-btn" class="desktop-sidebar-toggle" type="button" aria-label="Ciutkan sidebar" aria-expanded="true">
+                <span id="sidebar-toggle-arrow">&#9664;</span>
+            </button>
+
+            <div class="content content-shell" id="app-content">
                 @if (session('success'))
                     <div class="main desktop-alert">
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -188,55 +265,66 @@
             const sidebar = document.getElementById('app-sidebar');
             const header = document.getElementById('app-header');
             const content = document.getElementById('app-content');
+            const toggleButton = document.getElementById('sidebar-toggle-btn');
+            const toggleArrow = document.getElementById('sidebar-toggle-arrow');
+            const desktopToggle = document.querySelector('#app-header .desktop-toggle');
             const desktopQuery = window.matchMedia('(min-width: 992px)');
+            const storageKey = 'upa-sidebar-collapsed';
 
-            if (!sidebar || !header || !content) {
+            if (!sidebar || !header || !content || !toggleButton || !toggleArrow) {
                 return;
             }
 
-            const collapseDesktopNav = function () {
+            const setDesktopSidebarState = function (collapsed, persistState = true) {
                 if (!desktopQuery.matches) {
+                    document.body.classList.remove('sidebar-collapsed');
                     sidebar.classList.remove('nav-menu-collapse');
                     header.classList.remove('is-collapse');
                     content.classList.remove('is-collapse');
+                    toggleArrow.innerHTML = '&#9664;';
+                    toggleButton.setAttribute('aria-expanded', 'true');
+                    toggleButton.setAttribute('aria-label', 'Ciutkan sidebar');
+
                     return;
                 }
 
-                sidebar.classList.add('nav-menu-collapse');
-                header.classList.add('is-collapse');
-                content.classList.add('is-collapse');
+                document.body.classList.toggle('sidebar-collapsed', collapsed);
+                sidebar.classList.toggle('nav-menu-collapse', collapsed);
+                header.classList.toggle('is-collapse', collapsed);
+                content.classList.toggle('is-collapse', collapsed);
+                toggleArrow.innerHTML = collapsed ? '&#9654;' : '&#9664;';
+                toggleButton.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+                toggleButton.setAttribute('aria-label', collapsed ? 'Buka sidebar' : 'Ciutkan sidebar');
+
+                if (persistState) {
+                    window.localStorage.setItem(storageKey, collapsed ? '1' : '0');
+                }
             };
 
-            const expandDesktopNav = function () {
+            const syncDesktopSidebar = function () {
+                const collapsed = window.localStorage.getItem(storageKey) === '1';
+
+                setDesktopSidebarState(collapsed, false);
+            };
+
+            syncDesktopSidebar();
+
+            toggleButton.addEventListener('click', function () {
+                setDesktopSidebarState(!document.body.classList.contains('sidebar-collapsed'));
+            });
+
+            desktopToggle?.addEventListener('click', function () {
                 if (!desktopQuery.matches) {
                     return;
                 }
 
-                sidebar.classList.remove('nav-menu-collapse');
-                header.classList.remove('is-collapse');
-                content.classList.remove('is-collapse');
-            };
-
-            collapseDesktopNav();
-
-            sidebar.addEventListener('mouseenter', expandDesktopNav);
-            sidebar.addEventListener('mouseleave', collapseDesktopNav);
-            sidebar.addEventListener('focusin', expandDesktopNav);
-
-            document.addEventListener('click', function (event) {
-                if (!desktopQuery.matches) {
-                    return;
-                }
-
-                if (!sidebar.contains(event.target)) {
-                    collapseDesktopNav();
-                }
+                setDesktopSidebarState(!document.body.classList.contains('sidebar-collapsed'));
             });
 
             if (typeof desktopQuery.addEventListener === 'function') {
-                desktopQuery.addEventListener('change', collapseDesktopNav);
+                desktopQuery.addEventListener('change', syncDesktopSidebar);
             } else if (typeof desktopQuery.addListener === 'function') {
-                desktopQuery.addListener(collapseDesktopNav);
+                desktopQuery.addListener(syncDesktopSidebar);
             }
         });
     </script>
