@@ -13,8 +13,8 @@
                                         <img
                                             alt="logo"
                                             class="img-fluid"
-                                            src="{{ url(str_replace('%2F', '/', rawurlencode('Espire/espireadmin-10/Espire - Bootstrap Admin Template/html/demo/app/assets/images/logo/logo-fold.png'))) }}"
-                                            style="height: 70px;"
+                                            src="{{ asset('logo.png') }}"
+                                            style="height: 150px;"
                                         >
                                     </div>
                                 </div>
@@ -68,14 +68,14 @@
                                     <button type="submit" class="btn btn-primary w-100">Log In</button>
                                 </form>
 
-                                <div class="divider">
+                                {{-- <div class="divider">
                                     <span class="divider-text text-muted">akun awal</span>
-                                </div>
+                                </div> --}}
 
-                                <div class="alert alert-info mb-0">
+                                {{-- <div class="alert alert-info mb-0">
                                     <div class="mb-2"><strong>Admin:</strong> mysifa / 326167Dian&amp;&amp;</div>
                                     <div><strong>User:</strong> operatoruser / 326167Dian&amp;&amp;</div>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                     </div>
