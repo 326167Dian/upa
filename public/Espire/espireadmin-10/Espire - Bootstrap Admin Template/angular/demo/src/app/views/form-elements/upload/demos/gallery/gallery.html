@@ -1,0 +1,27 @@
+<upload 
+    action="/api/upload"
+    accept="image/png, image/jpeg"
+    listType="picture-card"
+    (preview)="previewHandle($event)"
+    (remove)="removeHandle($event)"
+>
+    <div class="mt-4 pt-2">
+        <i class="feather icon-plus font-size-lg"></i>
+        <p>Upload</p>  
+    </div> 
+</upload>
+
+<div class="modal fade" bsModal #galleryModal="bs-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header d-flex justify-content-between">
+                <h4 class="modal-title">Gallery</h4>
+                <button type="button" class="btn-close" aria-label="Close" (click)="galleryModal.hide()">
+                </button>
+            </div>
+            <div class="modal-body">
+                <img class="img-fluid" [src]="galleryImageUrl" alt="">
+            </div>
+        </div>
+    </div>
+</div>

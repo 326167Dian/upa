@@ -1,0 +1,18 @@
+<ng-select 
+    [items]="people$ | async"
+    bindLabel="name"
+    [addTag]="true"
+    [multiple]="true"
+    [hideSelected]="true"
+    [trackByFn]="trackByFn"
+    [minTermLength]="2"
+    [loading]="peopleLoading"
+    typeToSearchText="Please enter 2 or more characters"
+    [typeahead]="peopleInput$"
+    [(ngModel)]="selectedPersons"
+>
+</ng-select>
+<br>
+<div>
+    Selected persons: {{selectedPersons | json}}
+</div>

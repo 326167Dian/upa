@@ -1,0 +1,5 @@
+<form [formGroup]="form" (ngSubmit)="submit()">
+    <radio formControlName="gender" value="Male" name="radioInlineDemo" [inline]="true">Male</radio>
+    <radio formControlName="gender" value="Female" name="radioInlineDemo" [inline]="true">Female</radio>
+    <button class="btn btn-primary" type="submit" [disabled]="!form.valid">Submit</button>
+</form>

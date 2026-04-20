@@ -1,0 +1,131 @@
+<div class="mb-4 d-md-flex align-items-center justify-content-between">
+    <div>
+        <h4>Personal Information</h4>
+        <p>Basic info, like your name and address on this account.</p>
+    </div>
+    <button *ngIf="!edit" (click)="onEdit()" class="btn btn-primary">Edit Profile</button>
+</div>
+<div class="row">
+    <div class="col" style="max-width: 200px;">
+        <div>
+            <div class="mb-3">
+                <img class="img-fluid w-100 rounded" [src]="imageUrl" alt="avater">
+            </div>
+            <upload
+                action="/api/upload"
+                accept="image/png, image/jpeg"
+                [showFileList]="false"
+            >
+                <button class="btn btn-secondary w-100">
+                    Upload
+                </button>
+            </upload>
+        </div>
+    </div>
+    <div class="col-md" *ngIf="!edit">
+        
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th class="py-4">First Name</th>
+                    <td class="py-4">{{formGroup.value.firstName}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Last Name</th>
+                    <td class="py-4">{{formGroup.value.lastName}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Email</th>
+                    <td class="py-4">{{formGroup.value.email}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Phone</th>
+                    <td class="py-4">+ {{formGroup.value.phone}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Website</th>
+                    <td class="py-4">{{formGroup.value.website}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Gender</th>
+                    <td class="py-4">{{formGroup.value.gender}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Birthday</th>
+                    <td class="py-4">{{formGroup.value.birthDate | date: 'dd/MM/yyyy'}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Address</th>
+                    <td class="py-4">{{formGroup.value.address}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Zip</th>
+                    <td class="py-4">{{formGroup.value.zip}}</td>
+                </tr>
+                <tr>
+                    <th class="py-4">Bio</th>
+                    <td class="py-4">{{formGroup.value.bio}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-10" *ngIf="edit">
+        <form [formGroup]="formGroup" (validSubmit)="onSubmit()">
+            <div class="row">
+                <div class="col form-group mb-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" formControlName="firstName">
+                </div>
+                <div class="col form-group mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" formControlName="lastName">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col form-group mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" formControlName="email">
+                </div>
+                <div class="col form-group mb-3">
+                    <label class="form-label">Birthday</label>
+                    <input type="text" class="form-control" bsDatepicker formControlName="birthDate">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col form-group mb-3">
+                    <label class="form-label">Address</label>
+                    <input type="text" class="form-control" formControlName="address">
+                </div>
+                <div class="col form-group mb-3">
+                    <label class="form-label">Zip code</label>
+                    <input type="text" class="form-control" formControlName="zip">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col form-group mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input type="text" class="form-control" formControlName="phone">
+                </div>
+                <div class="col form-group mb-3">
+                    <label class="form-label">Website</label>
+                    <input type="text" class="form-control" formControlName="website">
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Gender</label>
+                <div>
+                    <radio formControlName="gender" value="Male" name="radioInlineDemo" [inline]="true">Male</radio>
+                    <radio formControlName="gender" value="Female" name="radioInlineDemo" [inline]="true">Female</radio>
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Bio</label>
+                <textarea type="text" class="form-control" formControlName="bio"></textarea>
+            </div>
+            <div class="text-end">
+                <button class="btn btn-secondary ms-2" (click)="onEdit()">Cancel</button>
+                <button class="btn btn-primary" type="submit">Change</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+<perfect-scrollbar class="mail-content-wrapper" *ngIf="mail">
+    <div>
+        <div class="mail-content-header">
+            <div class="d-flex align-items-center ">
+                <div class="me-2 d-block d-lg-none cursor-pointer" (click)="onMobileContentToggleClick()">
+                    <i class="feather icon-arrow-left font-size-lg"></i>
+                </div>
+                <div class="d-flex align-items-center">
+                    <avatar [size]="35" [src]="mail.avatar"></avatar>
+                    <div class="ms-2">
+                        <div class="d-flex align-items-center">
+                            <h6 class="mb-0">{{mail.name}}</h6>
+                            <span class="d-none d-md-block"><{{mail.mail}}></span>
+                        </div>
+                        <span class="text-muted">{{mail.date}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mail-content-action">
+                <a href="javascript:void(0)" class="ms-2">
+                    <i class="las la-reply"></i>
+                </a>
+                <a href="javascript:void(0)" class="ms-2">
+                    <i class="las la-reply-all"></i>
+                </a>
+                <a href="javascript:void(0)" class="ms-2">
+                    <i class="lar la-trash-alt"></i>
+                </a>
+            </div>
+        </div>
+        <div class="mail-content-body mt-5">
+            <h5 class="mb-4">{{mail.title}}</h5>
+            <p [innerHTML]="mail.content"></p>
+            <div class="d-md-flex mt-4">
+                <a class="mail-content-file" *ngFor="let item of mail.attachment" style="min-width: 200px">
+                    <div class="d-flex align-items-center">
+                        <div class="me-2">
+                            <i class="las la-file-download font-size-lg"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{item.file}}</h6>
+                            <span class="font-size-13 text-muted">{{item.size}}</span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="mt-5">
+                <div class="mail-content-reply" *ngIf="!replyInput" (click)="showInput()">
+                    Start typing to reply...
+                </div>
+                <div *ngIf="replyInput">
+                    <quill-editor class="w-100 d-block" [style]="{height: '100px'}" [modules]="editorConfig" placeholder=""></quill-editor>
+                    <div class="mt-5 pt-3 text-end">
+                        <button class="btn btn-secondary me-2" (click)="hideInput()">Discard</button>
+                        <button class="btn btn-primary">Reply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</perfect-scrollbar>

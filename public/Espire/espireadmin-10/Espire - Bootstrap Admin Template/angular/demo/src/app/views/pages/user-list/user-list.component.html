@@ -1,0 +1,121 @@
+<div class="container-fluid p-0" style="width: 98%;">
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-3 d-flex align-items-center justify-content-between">
+                <h4 class="mb-2 fw-bolder">Users List</h4>
+                <div class="mb-2">
+                    <input
+                        type="text"
+                        class="form-control mb-3"
+                        placeholder="Search user by name"
+                        (keyup)="updateFilter($event)"
+                    />
+                </div>
+            </div>
+            <div class="table-responsive">
+                <ngx-datatable
+                    #table
+                    [rows]="users"
+                    [columnMode]="columnMode"
+                    [headerHeight]="50"
+                    [footerHeight]="50"
+                    [limit]="10"
+                    [selected]="selected"
+                    [selectionType]="SelectionType.checkbox"
+                    (activate)="onActivate($event)"
+                    (select)="onSelect($event)"
+                    [rowHeight]="rowHeight"
+                    [scrollbarH]="scrollbarH"
+                >
+                    <ngx-datatable-column
+                        [width]="40"
+                        [sortable]="false"
+                        [canAutoResize]="false"
+                        [draggable]="false"
+                        [resizeable]="false"
+                    >
+                        <ng-template
+                            ngx-datatable-header-template
+                            let-value="value"
+                            let-allRowsSelected="allRowsSelected"
+                            let-selectFn="selectFn"
+                        >
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" [checked]="allRowsSelected" (change)="selectFn(!allRowsSelected)" />
+                            </div>
+                        </ng-template>
+                        <ng-template
+                            ngx-datatable-cell-template
+                            let-value="value"
+                            let-isSelected="isSelected"
+                            let-onCheckboxChangeFn="onCheckboxChangeFn"
+                        >
+                            <div class="form-check mb-0">
+                                <input class="form-check-input" type="checkbox" [checked]="isSelected" (change)="onCheckboxChangeFn($event)" />
+                            </div>
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column name="Name" [width]="350">
+                        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                            <div class="d-flex align-items-center">
+                                <avatar [size]="38" [src]="row['img']"></avatar>
+                                <div class="ms-2">
+                                    <div class="text-dark fw-bold">{{row['name']}}</div>
+                                    <div class="text-muted">{{row['email']}}</div>
+                                </div>
+                            </div>
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column name="Phone" [width]="70">
+                        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                            {{row['phone']}}
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column name="Role" [width]="70">
+                        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                            {{row['role']}}
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column name="Status" [width]="70">
+                        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                            <div class="d-flex align-items-center" [ngClass]="row['status'] === 'active'? 'text-success': 'text-danger'">
+                                <span class="badge-dot me-2" [ngClass]="row['status'] === 'active'? 'bg-success': 'bg-danger'"></span>
+                                <span class="text-capitalize">{{row['status']}}</span>
+                            </div>
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column name="Last Online" [width]="70">
+                        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                            {{row['lastOnline'] | date: 'dd/MM/yyyy'}}
+                        </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [sortable]="false" cellClass="allow-overflow" [width]="40">
+                        <ng-template let-row="row" let-value="value" ngx-datatable-cell-template>
+                            <dropdown dropdownClass="d-block text-end ms-3" (click)="action.toggle($event)">
+                                <a class="px-2" href="javascript:void(0)">
+                                    <i class="feather icon-more-vertical"></i>
+                                </a>
+                                <dropdown-menu #action alignment="right">
+                                    <a dropdownItem href="javascript:void(0)">
+                                        <div class="d-flex align-items-center">
+                                            <i class="feather icon-user-plus"></i>
+                                            <span class="ms-2">Add to group</span>
+                                            <span class="ms-1" *ngIf="selected.length > 0">({{selected.length}})</span>
+                                        </div>
+                                    </a>
+                                    <a dropdownItem href="javascript:void(0)">
+                                        <div class="d-flex align-items-center">
+                                            <i class="feather icon-trash-2"></i>
+                                            <span class="ms-2">Delete User</span>
+                                            <span class="ms-1" *ngIf="selected.length > 0">({{selected.length}})</span>
+                                        </div>
+                                    </a>
+                                </dropdown-menu>
+                            </dropdown>
+                        </ng-template>
+                    </ngx-datatable-column>
+                </ngx-datatable>
+            </div>
+        </div>
+    </div>
+</div>

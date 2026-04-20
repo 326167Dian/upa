@@ -1,0 +1,35 @@
+<div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h4 class="mb-0">Recent Transaction</h4>
+        <button class="btn btn-outline-secondary btn-sm">All Transaction</button>
+    </div>
+    <div style="min-height: 300px;">
+        <table *ngIf="data" class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="cursor-pointer" *ngFor="let item of data">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <avatar [size]="35" [src]="item.img"></avatar>
+                            <div class="ms-2">
+                                <div class="fw-bolder text-dark">{{item.name}}</div>
+                                <div class="text-muted fw-semibold">ID: {{item.transactionId}}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{item.date | date: 'dd MMM'}}</td>
+                    <td>
+                        <div class="badge-dot" [ngStyle]="{'background-color': getBadgeColor(item.status)}"></div>
+                        <span class="ms-2">{{item.status}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

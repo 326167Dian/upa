@@ -1,0 +1,31 @@
+<div class="card">
+    <div class="container-fluid">
+        <div class="row content-min-height">
+            <column-panel [borderRight]="true" [panelWidth]="230" class="p-0">
+                <h4 class="mb-3 ms-3 mt-3">Profile</h4>
+                <div class="columns-panel-item-group">
+                    <a 
+                        href="javascript:void(0)"
+                        class="columns-panel-item columns-panel-item-link" 
+                        [class.active]="currentPanel === item.title"
+                        *ngFor="let item of panelMenu"
+                        (click)="onPanelChange(item.title)"
+                    >
+                        <div class="d-flex align-items-center" >
+                            <i class="feather font-size-lg" [ngClass]="item.icon"></i>
+                            <span class="ms-3">{{item.title}}</span>
+                        </div>
+                    </a>
+                </div>
+            </column-panel>
+            <div class="col">
+                <div class="card-body">
+                    <profile-personal *ngIf="currentPanel === 'Personal'"></profile-personal>
+                    <profile-notification *ngIf="currentPanel === 'Notification'"></profile-notification>
+                    <profile-security *ngIf="currentPanel === 'Security'"></profile-security>
+                    <profile-social-connect *ngIf="currentPanel === 'Connect'"></profile-social-connect>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

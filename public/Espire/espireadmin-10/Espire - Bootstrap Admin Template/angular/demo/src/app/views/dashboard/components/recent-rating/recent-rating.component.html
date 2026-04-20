@@ -1,0 +1,34 @@
+<div class="card-body">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h4>Recent Review</h4>
+        <button class="btn btn-sm btn-outline-secondary">All Review</button>
+    </div>
+    <div *ngIf="data">
+        <perfect-scrollbar style="overflow-y: auto; height: 365px;">
+            <div class="my-3" [ngClass]="{'border-bottom': i !== data.length - 1}" *ngFor="let item of data; let i = index">
+                <div class="d-flex pe-3">
+                    <div class="mt-1">
+                        <avatar [size]="35" [src]="item.img"></avatar>
+                    </div>
+                    <div class="ms-2 w-100">
+                        <div class="mb-2 d-md-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="fw-bolder text-dark">{{item.name}}</div>
+                                <div class="text-muted fw-semibold">{{item.date | date: 'dd MMM yyyy'}}</div>
+                            </div>
+                            <div>
+                                <i 
+                                    class="font-size-lg"
+                                    [ngClass]="item.rating >= star ? 'la la-star text-warning' : 'la la-star-o text-muted'" 
+                                    *ngFor="let star of maxRate"
+                                >
+                                </i>
+                            </div>
+                        </div>
+                        <p class="mb-3">{{item.review}}</p>
+                    </div>
+                </div>
+            </div>
+        </perfect-scrollbar>
+    </div>
+</div>

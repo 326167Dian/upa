@@ -1,0 +1,20 @@
+<ngx-datatable
+    [rows]="rows"
+    [columns]="[
+        { name: 'Name', sortable: false },
+        { name: 'Gender', sortable: false },
+        { name: 'Company', sortable: false }
+    ]"
+    [columnMode]="ColumnMode.force"
+    [headerHeight]="50"
+    [loadingIndicator]="isLoading > 0"
+    [scrollbarV]="true"
+    [footerHeight]="50"
+    [rowHeight]="50"
+    [externalPaging]="true"
+    [externalSorting]="true"
+    [count]="totalElements"
+    [offset]="pageNumber"
+    (page)="setPage($event)"
+>
+</ngx-datatable>

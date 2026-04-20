@@ -1,0 +1,16 @@
+<form [formGroup]="form" (ngSubmit)="submitForm()">
+    <checkbox
+        [inline]="true"
+        *ngFor="let data of Data; let i=index"
+        [value]="data.value"
+        (onChange)="onCheckboxChange($event)"
+    >
+        {{data.name}}
+    </checkbox>
+    <span class="ms-3">
+        <input class="btn btn-primary" type="submit" value="Submit">
+    </span>
+    <p class="text-danger" *ngIf="showError">
+        Checkbox is required
+    </p>
+</form>

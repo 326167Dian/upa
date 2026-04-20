@@ -1,0 +1,16 @@
+<div class="card mb-0">
+    <div class="d-flex content-min-height">
+        <column-panel borderRight="true" [panelWidth]="280" class="p-0">
+            <div class="p-2">
+                <ul class="nav-menu">
+                    <li class="nav-menu-item" *ngFor="let item of docNavTree">
+                        <a [routerLink]="'/docs' + item.path">{{item.title}}</a>
+                    </li>
+                </ul>
+            </div>
+        </column-panel>
+        <div class="card-body">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>

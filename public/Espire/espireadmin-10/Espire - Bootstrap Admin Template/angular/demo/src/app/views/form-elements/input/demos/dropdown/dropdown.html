@@ -1,0 +1,19 @@
+<div class="input-group mb-3">
+    <dropdown (click)="dropdownInput.toggle($event)">
+        <button 
+            class="btn btn-outline-secondary dropdown-toggle" 
+            type="button" 
+        >
+            {{leftDropdownValue}}
+        </button>
+        <dropdown-menu #dropdownInput >
+            <a 
+                href="javaScript:void(0)"
+                dropdownItem 
+                (click)="onLeftDropdownChange(item)" 
+                *ngFor="let item of dropdownList"
+            >{{item}}</a>
+        </dropdown-menu>
+    </dropdown>
+    <input type="text" class="form-control" aria-label="Text input with dropdown button">
+</div>

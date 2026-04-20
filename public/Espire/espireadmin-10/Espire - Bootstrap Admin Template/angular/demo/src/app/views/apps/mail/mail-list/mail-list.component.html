@@ -1,0 +1,72 @@
+<div class="mail-list-header">
+    <div class="d-flex">
+        <div class="form-check mb-0" *ngIf="!displayNoMailMessage">
+            <input class="form-check-input" type="checkbox" (change)="selectAll($event)" />
+        </div>
+        <div class="d-block d-lg-none cursor-pointer ms-2" (click)="onMobilePanelToggleClick()">
+            <i class="feather icon-menu"></i>
+        </div>
+    </div>
+    <div class="d-flex align-items-center" *ngIf="selected.length > 0">
+        <div class="mail-list-icon-delete me-2">
+            <i class="feather icon-trash me-1" (click)="deleteSelectedMail()"></i>
+        </div>
+        <dropdown dropdownClass="mail-list-icon-folder" (click)="moveTo.toggle($event)">
+            <div class="toggle-wrapper">
+                <i class="feather icon-folder me-1"></i>
+            </div>
+            <dropdown-menu #moveTo alignment="right">
+                <div class="dropdown-header">
+                    <span class="fw-bold text-dark">Move to...</span>
+                </div>
+                <a dropdownItem *ngFor="let item of catogories">
+                    {{item.title}}
+                </a>
+            </dropdown-menu>
+        </dropdown>
+    </div>
+</div>
+<perfect-scrollbar class="mail-list-body">
+    <div class="text-center mt-4" *ngIf="displayNoMailMessage">
+        <i class="feather icon-alert-circle ms-2"></i>
+        <span>No mail in list</span>
+    </div>
+    <div class="mail-list-row" 
+        *ngFor="let row of data"
+        [ngClass]="{'active': row.id === selectedMail}"
+        (click)="onRowClick(row.id, $event)"
+    >
+        <div class="d-flex"> 
+            <div class="form-check" style="margin-top: 10px;">
+                <input class="form-check-input" type="checkbox" [checked]="row.checked" (change)="onCheckboxChangeFn(row.id,  $event)" />
+            </div>
+            <div class="mail-list-row-detail ms-2">
+                <div class="d-flex">
+                    <avatar class="mt-1" [size]="35" [src]="row.avatar" style="min-width: 35px"></avatar>
+                    <div class="ms-2">
+                        <span class="text-muted fw-bold font-size-sm">{{row.name}}</span>
+                        <h6 class="">
+                            {{row.title | slice:0:20}}
+                            {{row.title.length > 20 ? '...' : ''}}
+                        </h6>
+                        <p class="mb-0">
+                            {{formatBody(row.content) | slice:0:50}}
+							{{formatBody(row.content).length > 50 ? '...' : ''}}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="me-2 d-flex flex-column justify-content-between" style="min-width: 55px;">
+                <div class="font-size-sm mt-1 text-end">{{row.date}}</div>
+                <div class="d-flex justify-content-end">
+                    <div class="mail-list-clip me-2" *ngIf="row.attachment.length > 0">
+                        <i class="las la-paperclip"></i>
+                    </div>
+                    <div class="mail-list-star" (click)="onMark(row.id, row.marked)">
+                        <i class="la-star" [ngClass]="row.marked === 1 ? 'lar' : 'las text-warning'"></i>
+                    </div> 
+                </div>
+            </div>
+        </div>
+    </div>
+</perfect-scrollbar>

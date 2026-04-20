@@ -1,0 +1,41 @@
+<div>
+    <h4>Menu Stucture</h4>
+    <p>We creating navigations from data dynamically, configuration can be found at <code>src/app/configs/nav.config.ts</code> here is our Navigation metadata looks like:</p>
+    <pre class="prettyprint lang-typescript" [innerHTML]="navMetaDataSyntax"></pre>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">path</th>
+                <td>The route path navigate to.</td>
+            </tr>
+            <tr>
+                <th scope="row">title</th>
+                <td>Title of the navigation item.</td>
+            </tr>
+            <tr>
+                <th scope="row">translateKey</th>
+                <td>Translate key the navigation item. </td>
+            </tr>
+            <tr>
+                <th scope="row">type</th>
+                <td>Navigation item type. </td>
+            </tr>
+            <tr>
+                <th scope="row">iconType</th>
+                <td>Icon type of the navigation item. </td>
+            </tr>
+            <tr>
+                <th scope="row">icon</th>
+                <td>Icon name of the navigation item according to iconType. </td>
+            </tr>
+            <tr>
+                <th scope="row">submenu</th>
+                <td>Array of navigation items to create child items, value will be [] if there is no sub menu.</td>
+            </tr>
+            <tr>
+                <th scope="row">key</th>
+                <td>Unique id of the navigation item.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

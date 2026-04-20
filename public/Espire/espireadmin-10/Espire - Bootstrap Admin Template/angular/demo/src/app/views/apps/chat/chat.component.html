@@ -1,0 +1,39 @@
+<div class="chat card mb-0">
+    <div class="d-flex content-min-height content-max-height">
+        <column-panel borderRight="true" [panelWidth]="350" class="p-0" [isMobileActive]="mobilePanelOpen">
+            <div class="chat-panel">
+                <div class="chat-panel-header">
+                    <div class="input-affix">
+                        <i class="prefix-icon feather icon-search"></i>
+                        <input type="text" class="form-control" placeholder="Search" (keyup)="serach($event)">
+                    </div>
+                </div>
+                <perfect-scrollbar class="chat-panel-body">
+                    <div class="chat-list-row" 
+                        [ngClass]="{'active': item.id === selectedId}" 
+                        *ngFor="let item of chatList" 
+                        (click)="selectChat(item.id)"
+                    >
+                        <avatar [size]="35" [src]="item.avatar" style="min-width: 35px"></avatar>
+                        <div class="ms-2 col-8">
+                            <h6 class="mb-0">{{item.name}}</h6>
+                            <ng-container *ngFor="let item of item.msg; let last = last">
+                                <p *ngIf="last" class="chat-list-row-msg mb-0 text-muted">
+                                    {{item.text}}
+                                </p>
+                            </ng-container>
+                        </div>
+                        <div class="ms-3 chat-list-row-detai">
+                            <span class="text-muted font-size-sm">{{item.time}}</span>
+                        </div>
+                    </div>
+                </perfect-scrollbar>
+            </div>
+        </column-panel>
+        <conversation 
+            [chatId]="selectedId" 
+            (updateChat)="updateChat($event)"
+            (openMobilePanel)="onMobilePanelToggleOpen()"
+        ></conversation>
+    </div>
+</div>

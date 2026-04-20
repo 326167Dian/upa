@@ -1,0 +1,75 @@
+<div>
+    <h4>Security  Setting</h4>
+    <p >Config your security setting to protect your account.</p>
+</div>
+<div class="my-4">
+    <h5 class="mb-3">Login</h5>
+    <row-content
+        title="Change Password"
+        icon="icon-lock"
+        description="It is a good idea to use a strong password that you are not using elsewhere"
+        [handler]="changePasswordBtn"
+    >
+        <div class="mt-4" *ngIf="showEdit" style="max-width: 800px;">
+            <form [formGroup]="form" (validSubmit)="onSubmit(form.value)">
+                <div class="row mb-3 form-group">
+                    <label class="col-form-label" style="width: 200px;">Password:</label>
+                    <div class="col">
+                        <input type="password" class="form-control" formControlName="password">
+                    </div>
+                </div>
+                <div class="row mb-3 form-group">
+                    <label class="col-form-label" style="width: 200px;">New Password:</label>
+                    <div class="col">
+                        <input type="password" class="form-control" formControlName="newPassword">
+                    </div>
+                </div>
+                <div class="row mb-3 form-group">
+                    <label class="col-form-label" style="width: 200px;">Confirm Password:</label>
+                    <div class="col">
+                        <input type="password" class="form-control" formControlName="confirmPassword">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col" style="margin-left:200px">
+                        <button class="btn btn-secondary me-2" (click)="editForm()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </row-content>
+    <row-content
+        title="Save login Information"
+        icon="icon-user-check"
+        description="Save your login info to skip login session for next vist."
+        [handler]="saveLoginAction"
+    >
+    </row-content>
+</div>
+<div class="my-4">
+    <h5 class="mb-3">Two-Factor Authentication</h5>
+    <row-content
+        title="Use 2FA Authentication"
+        icon="icon-shield"
+        description="We will ask for a code if we notice an attempted login from an unrecognized device or browser."
+        [handler]="twoFaAction"
+    >
+    </row-content>
+</div>
+
+<ng-template #changePasswordBtn>
+    <button class="btn btn-primary" *ngIf="!showEdit" (click)="editForm()">Change</button>
+</ng-template>
+
+<ng-template #saveLoginAction>
+    <div class="mt-md-3">
+        <switch name="loginInfo" [(ngModel)]="saveLogin"></switch>
+    </div>
+</ng-template>
+
+<ng-template #twoFaAction>
+    <div class="mt-md-3">
+        <switch name="twoFa" [(ngModel)]="use2Fa"></switch>
+    </div>
+</ng-template>

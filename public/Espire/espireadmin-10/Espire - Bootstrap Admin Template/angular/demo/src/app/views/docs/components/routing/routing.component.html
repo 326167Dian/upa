@@ -1,0 +1,20 @@
+<div>
+    <h4>Routing</h4>
+    <p>Espire comes with 2 types of main view, which is auth view &amp; app view, each view has it own route tree located at <code>src/app/routes</code></p>
+    <ul>
+        <li>
+            <strong class="text-dark fw-bold">App View</strong>
+            <p>- along with Navigation, Header, Footer & etc, mainly serve for core application.</p>
+        </li>
+        <li>
+            <strong class="text-dark fw-bold">Auth View</strong>
+            <p>- did not comes with any template components, mainly serve for authentication such like login, register & or other pre login pages.</p>
+        </li>
+    </ul>
+    <p>Example of routes</p>
+    <pre class="prettyprint lang-typescript" [innerHTML]="routeExampleSyntax"></pre>
+    <p class="mt-4">You can pass data to the route to config the PageHeader, here is some metadata for route data:</p>
+    <pre class="prettyprint lang-typescript" [innerHTML]="routeMetadataSyntax"></pre>
+    <p class="mt-4">For example:</p>
+    <pre class="prettyprint lang-typescript" [innerHTML]="exampleRouteSyntax"></pre>
+</div>

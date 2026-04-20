@@ -1,0 +1,53 @@
+<div class="conversation-header">
+    <div class="d-flex align-items-center">
+        <div class="d-block d-lg-none cursor-pointer me-2 font-size-lg" (click)="onMobilePanelOpen()">
+            <i class="feather icon-menu"></i>
+        </div>
+        <h5 class="mb-0"><span *ngIf="chat">{{chat.name}}</span></h5>
+    </div>
+</div>
+<perfect-scrollbar class="conversation-body" #chatPS>
+    <div class="p-4" *ngIf="chat">
+        <div class="msg" *ngFor="let item of chat.msg" [ngClass]="{'msg-recipient':item.from == 'opposite', 'msg-sent': item.from == 'me', 'justify-content-center': item.msgType == 'date'}">                                  
+            <div class="ms-2" *ngIf="item.avatar.length > 1">
+                <avatar *ngIf="item.avatar.length > 1" [icon]="'feather icon-user'" [src]="item.avatar"></avatar>
+            </div>
+            <div class="bubble"  [ngClass]="{'no-avatar': item.avatar.length == 0}">
+                <div class="bubble-wrapper" [ngClass]="{'p-3': item.msgType == 'image'}">
+                    <span *ngIf="item.msgType == 'text'">{{item.text}}</span>
+                    <img *ngIf="item.msgType == 'image'" [src]="item.text" [alt]="item.text">
+                    <div *ngIf="item.msgType == 'file'" class="d-flex align-items-center msg-file">
+                        <i class="font-size-lg" class="feather icon-file"></i>
+                        <span class="ms-2 fw-bold text-link cursor-pointer">
+                            <u>{{item.text}}</u>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="fw-bold font-size-sm" *ngIf="item.time.length > 1">
+                {{item.time}}
+            </div>
+        </div>
+    </div>
+</perfect-scrollbar>
+<div class="conversation-footer">
+    <input 
+        type="text" 
+        class="form-control ms-2" 
+        placeholder="Enter your message here" 
+        [(ngModel)]="message" 
+        (keydown.enter)="sendMessage();$event.preventDefault()"
+    >
+    <div class="conversation-footer-icon d-flex">
+        <a class="mx-2" href="javascript:void(0)">
+            <i class="las la-paperclip"></i>
+        </a>
+        <a class="mx-2" href="javascript:void(0)">
+            <i class="las la-smile"></i>
+        </a>
+    </div>
+    <button class="btn btn-primary ms-2" (click)="sendMessage()">
+        <span>Send</span>
+        <i class="feather icon-send"></i>
+    </button>
+</div>

@@ -1,0 +1,25 @@
+<div class="card-body">
+    <h4 class="mb-3">Overview</h4>
+    <div class="row" *ngIf="data">
+        <div class="col-6 col-md-3" *ngFor="let item of data.sum; let i=index">
+            <div class="text-center py-3" [ngClass]="{'border-end': i !== data.sum.length - 1}">
+                <h5>{{item.value | currency : 'USD' : 'symbol' : '1.0-0'}}</h5>
+                <span class="text-muted">{{item.name}}</span>
+            </div>
+        </div>
+    </div>
+    <div id="dash-line">
+        <apx-chart
+            [series]="overviewChartOptions.series"
+            [chart]="overviewChartOptions.chart"
+            [xaxis]="overviewChartOptions.xaxis"
+            [stroke]="overviewChartOptions.stroke"
+            [tooltip]="overviewChartOptions.tooltip"
+            [dataLabels]="overviewChartOptions.dataLabels"
+            [legend]="overviewChartOptions.legend"
+            [markers]="overviewChartOptions.markers"
+            [grid]="overviewChartOptions.grid"
+            [yaxis]="overviewChartOptions.yaxis"
+        ></apx-chart>
+    </div>
+</div>

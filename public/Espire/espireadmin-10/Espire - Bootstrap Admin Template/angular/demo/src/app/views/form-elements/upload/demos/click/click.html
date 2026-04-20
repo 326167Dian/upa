@@ -1,0 +1,18 @@
+<div class="alert"
+    [ngClass]="{
+        'alert-success': status === 'success', 
+        'alert-danger': status === 'fail'
+    }"
+    *ngIf="showMessage"\
+    @fadeInOut>
+    {{message}}
+</div>
+<upload action="/api/upload"
+    [fileList]="fileList"
+    [uploadInterceptor]="limit500.bind(this)"
+    (success)="successFeedBack()"
+    (error)="failFeedBack()"
+>
+    <button class="btn btn-primary">Click to upload</button>
+    <p class="mt-2">Maximum file size 500kb</p>
+</upload>

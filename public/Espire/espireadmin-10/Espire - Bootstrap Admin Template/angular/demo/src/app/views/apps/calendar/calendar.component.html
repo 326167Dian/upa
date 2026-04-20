@@ -1,0 +1,183 @@
+<div class="card mb-0">
+    <div class="card-body">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <h4 class="mb-3">{{ viewDate | calendarDate:(view + 'ViewTitle'):'en' }}</h4>
+                    <div class="btn-group mx-3 mb-3">
+                        <div class="btn btn-outline-secondary" mwlCalendarPreviousView [view]="view" [(viewDate)]="viewDate">
+                            <i class="feather icon-chevron-left"></i>
+                        </div>
+                        <div class="btn btn-outline-secondary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate">
+                            <i class="feather icon-chevron-right"></i>
+                        </div>
+                    </div>
+                    <div class="btn btn-outline-secondary mb-3" mwlCalendarToday [(viewDate)]="viewDate">
+                        Today
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="btn-group me-md-3 mb-3">
+                    <div class="btn btn-outline-secondary" (click)="setView(CalendarView.Month)"
+                        [class.active]="view === CalendarView.Month">
+                        Month
+                    </div>
+                    <div class="btn btn-outline-secondary" (click)="setView(CalendarView.Week)"
+                        [class.active]="view === CalendarView.Week">
+                        Week
+                    </div>
+                    <div class="btn btn-outline-secondary" (click)="setView(CalendarView.Day)" [class.active]="view === CalendarView.Day">
+                        Day
+                    </div>
+                </div>
+                <button class="btn btn-primary mb-3" (click)="openAddEventModal(eventModal)">
+                    <i class="feather icon-plus"></i>
+                    <span>Add New Event</span>
+                </button>
+            </div>
+        </div>
+        <br />
+        <div [ngSwitch]="view">
+            <mwl-calendar-month-view 
+                *ngSwitchCase="CalendarView.Month"
+                
+                [cellTemplate]="customCellTemplate"
+                [viewDate]="viewDate" 
+                [events]="events"
+                [refresh]="refresh"  
+                (dayClicked)="dayClicked($event.day)"
+                (eventClicked)="handleEvent('Clicked', $event.event)" 
+                (eventTimesChanged)="eventTimesChanged($event)"
+            >
+            </mwl-calendar-month-view>
+            <mwl-calendar-week-view *ngSwitchCase="CalendarView.Week" [viewDate]="viewDate" [events]="events"
+                [refresh]="refresh" (eventClicked)="handleEvent('Clicked', $event.event)"
+                (eventTimesChanged)="eventTimesChanged($event)">
+            </mwl-calendar-week-view>
+            <mwl-calendar-day-view *ngSwitchCase="CalendarView.Day" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+                (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
+            </mwl-calendar-day-view>
+        </div>
+    </div>
+</div>
+
+<ng-template #customCellTemplate let-day="day" let-locale="locale">
+    <div class="cal-cell-top">
+      <span class="cal-day-number"
+        >{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span
+      >
+    </div>
+    <div class="cal-events" *ngIf="day.events.length > 0">
+        <div
+            class="cal-event"
+            *ngFor="let event of day.events; trackBy: trackByEventId"
+            [ngStyle]="{ backgroundColor: event.color?.primary }"
+            [ngClass]="event?.cssClass"
+            [popover]="popTemplate" 
+            [popoverContext]="event"
+            [outsideClick]="true"
+            [attr.aria-hidden]="{} | calendarA11y: 'hideMonthCellEvents'"
+        ></div>
+    </div>
+</ng-template>
+
+<ng-template 
+    #popTemplate 
+    let-title="title"
+    let-start="start"
+    let-end="end"
+    let-description="description"
+    let-color="color"
+    let-id="id"
+>
+    <div class="d-flex">
+        <div>
+            <div class="d-flex">
+                <span class="badge-dot" [ngStyle]="{'background-color': color.primary, 'margin-top': '7px'}"></span>
+                <div class="ms-2">
+                    <h5 class="mb-1">{{ title }}</h5>
+                    <div class="text-muted">
+                        <span>{{start | date: 'short'}}</span>
+                        <span class="mx-1" *ngIf="end">~</span>
+                        <span *ngIf="end">{{end | date: 'short'}}</span>
+                    </div>
+                    <p *ngIf="description" class="mt-3 mb-0">{{description}}</p>
+                </div>
+                <div class="ms-5 font-size-lg">
+                    <a class="ms-3" (click)="openEditEventModal(eventModal, id)">
+                        <i class="feather icon-edit"></i>
+                    </a>
+                    <a class="ms-2" (click)="deleteEvent(id)">
+                        <i class="feather icon-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #eventModal>
+    <div class="modal-header">
+        <h4 class="modal-title">{{modalMode === 'add' ? 'Add new' : 'Edit'}} event</h4>
+        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="formGroup" (validSubmit)="modalMode === 'add' ? addEvent() : editEvent()">
+            <div class="form-group mb-3">
+                <label class="form-label">Event Title</label>
+                <input type="text" class="form-control" formControlName="title">
+            </div>
+            <div class="row">
+                <div class="form-group mb-3 col-md-6">
+                    <label class="form-label">Date & Time</label>
+                    <input
+                        class="form-control"
+                        #datepickerYMD="bsDatepicker"
+                        bsDatepicker
+                        formControlName="start"
+                        [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }"
+                    >
+                </div>
+                <div class="form-group mb-3 col-md-6">
+                    <label class="form-label mt-3"></label>
+                    <input
+                        class="form-control"
+                        #datepickerYMD="bsDatepicker"
+                        bsDatepicker
+                        formControlName="end"
+                        [bsConfig]="{ dateInputFormat: 'YYYY-MM-DD' }"
+                    >
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Category</label>
+                <ng-select
+                    [items]="colorsSelection"
+                    formControlName="color"
+                >
+                    <ng-template ng-label-tmp let-item="item">
+                        <span class="badge-dot" [ngStyle]="{'background-color': getColorDetail(item).primary}"></span>
+                        {{item}}
+                    </ng-template>
+                    <ng-template ng-option-tmp let-item="item" let-index="index">
+                        <span class="badge-dot" [ngStyle]="{'background-color': getColorDetail(item).primary}"></span>
+                        {{item}}
+                    </ng-template>
+                </ng-select>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" formControlName="description"></textarea>
+            </div>
+            <div class="text-end" *ngIf="modalMode === 'add'">
+                <button class="btn btn-primary" type="submit">Add Event</button>
+            </div>
+            <div class="text-end" *ngIf="modalMode === 'edit'">
+                <button class="btn btn-primary" type="submit">Edit Event</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

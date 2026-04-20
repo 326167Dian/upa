@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+        <form [formGroup]="formGroup" (validSubmit)="onSubmit()">
+            <div class="form-group mb-3">
+                <label class="form-label">Email</label>
+                <input type="text" class="form-control" formControlName="Email">
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" formControlName="Password">
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label">Age</label>
+                <ng-select [items]="ages"
+                   [selectOnTab]="true"
+                   bindValue="value"
+                   labelForId="age"
+                   placeholder="Select age"
+                   formControlName="Age">
+                </ng-select>
+            </div>
+            <div class="form-group mb-3">
+                <checkbox formControlName="Check" single="true">Remember me</checkbox>
+            </div>
+            <button class="btn btn btn-light me-2" type="button" (click)="onReset()">Reset</button>
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+    </div>
+</div>

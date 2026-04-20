@@ -1,0 +1,61 @@
+<div class="container">
+    <h3 class="text-center">
+        <span class="text-capitalize">{{iconType}}</span> 
+        Icon
+    </h3>
+    <div class="mt-4 mx-auto" style="max-width: 800px;">
+        <div class="input-affix mb-3">
+            <i class="prefix-icon prefix-icon-lg feather icon-search"></i>
+            <input 
+                type="text"
+                placeholder="Search Icon..." 
+                [(ngModel)]="searchValue" 
+                class="form-control form-control-lg"
+                (keyup)="onSerach($event)"
+            >
+        </div>
+    </div>
+    <div class="mt-4" >
+        <div class="row" *ngIf="iconType === 'feather'">
+            <div class="col-6 col-md-2" *ngFor="let icon of icons">
+                <ng-container 
+                    *ngTemplateOutlet="iconDemo;context:{value: icon.value, name: icon.name}">
+                </ng-container>
+            </div>
+        </div>
+        <div *ngIf="iconType === 'line-awesome'">
+            <tabset>
+                <tab heading="Regular" class="mt-2" (selectTab)="onTabSelect($event)">
+                    <div class="row mt-3" *ngIf="lineAwesomeType === 'regular'">
+                        <div class="col-6 col-md-2" *ngFor="let icon of icons">
+                            <ng-container 
+                                *ngTemplateOutlet="iconDemo;context:{value: icon.value, name: icon.name}">
+                            </ng-container>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading="Brand" class="mt-2" (selectTab)="onTabSelect($event)">
+                    <div class="row mt-3" *ngIf="lineAwesomeType === 'brand'">
+                        <div class="col-6 col-md-2" *ngFor="let icon of icons">
+                            <ng-container 
+                                *ngTemplateOutlet="iconDemo;context:{value: icon.value, name: icon.name}">
+                            </ng-container>
+                        </div>
+                    </div>
+                </tab>
+            </tabset>
+        </div> 
+    </div>
+</div>
+<ng-template #iconDemo let-iconValue="value" let-iconName="name">
+    <div class="card mb-4 icon-demo" (click)="copyToClipboard(iconValue)">
+        <div class="card-body text-center">
+            <i [ngClass]="{
+                'feather': iconType === 'feather',
+                'la': iconType === 'line-awesome' && lineAwesomeType === 'regular',
+                'lab': iconType === 'line-awesome' && lineAwesomeType === 'brand'
+            }" [class]="iconValue"></i>
+            <p class="mt-2 mb-0">{{iconName}}</p>
+        </div>
+    </div>
+</ng-template>

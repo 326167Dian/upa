@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-lg-3">
+        <monthly-revenue value="$168.90" pnl="+18%">
+            <div id="basic-column" class="mt-4" style="max-width: 250px;">
+                <apx-chart
+                    [series]="monthlyRevenueChart.series"
+                    [chart]="monthlyRevenueChart.chart"
+                    [dataLabels]="monthlyRevenueChart.dataLabels"
+                    [plotOptions]="monthlyRevenueChart.plotOptions"
+                    [yaxis]="monthlyRevenueChart.yaxis"
+                    [legend]="monthlyRevenueChart.legend"
+                    [fill]="monthlyRevenueChart.fill"
+                    [stroke]="monthlyRevenueChart.stroke"
+                    [tooltip]="monthlyRevenueChart.tooltip"
+                    [xaxis]="monthlyRevenueChart.xaxis"
+                ></apx-chart>
+            </div>
+        </monthly-revenue>
+        <quater-revenue value="$3,936.80">
+            <div class="mt-4">
+                <h4 class="mb-1">88</h4>
+                <div class="text-muted d-flex justify-content-between mb-2">
+                    <span>Online Revenue</span>
+                    <span>70%</span>
+                </div>
+                <progressbar class="progress-sm" type="info" [value]="70"></progressbar>
+            </div>
+            <div class="mt-4 ">
+                <h4 class="mb-1">69</h4>
+                <div class="text-muted d-flex justify-content-between mb-2">
+                    <span>Offline Revenue</span>
+                    <span>50%</span>
+                </div>
+                <progressbar class="progress-sm" type="success" [value]="50"></progressbar>
+            </div>
+        </quater-revenue>
+    </div>
+    <div class="col-lg-9">
+        <region-data [mapData]="regionMapData"></region-data>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-7">
+        <overview [data]="overviewData"></overview>
+    </div>
+    <div class="col-md-5">
+        <recent-transaction [data]="recentTransactionData"></recent-transaction>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <recent-rating [data]="recentReviewData"></recent-rating>
+    </div>
+    <div class="col-md-4">
+        <device-satistic [data]="deviceStatisticData"></device-satistic>
+    </div>
+    <div class="col-md-4">
+        <countries [data]="countriesData"></countries>
+    </div>
+</div>

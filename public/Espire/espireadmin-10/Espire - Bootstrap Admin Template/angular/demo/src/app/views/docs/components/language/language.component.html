@@ -1,0 +1,20 @@
+<div>
+    <h4>Language</h4>
+    <p>Espire support multi language, we use <code>ngx-translate</code> implement the translation.</p>
+    <div class="mt-4">
+        <h5>Setting default language</h5>
+        <p>You can config your supported & default language in <code>src/app/configs/i18n.config.ts</code>.</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="defaultLanguageSyntax"></pre>
+    </div>
+    <div class="mt-4">
+        <h5>Add new language</h5>
+        <p>You can add your new language folder & translate key to directory <code>src/app/i18n</code> as the code below.</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="newLanguageSyntax"></pre>
+        <p>Import your translation to TranslateService at <code>app.component.ts</code></p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="importTranslationSyntax"></pre>
+        <p>Use translateService.use() to set your current language.</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="translationServiceSyntax"></pre>
+        <p>Usage in html</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="usageInHtmlSyntax"></pre>
+    </div>
+</div>

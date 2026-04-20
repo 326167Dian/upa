@@ -1,0 +1,23 @@
+<div class="p-4">
+    <form>
+        <div class="row mb-3">
+            <label for="sentTo" class="col col-form-label" style="max-width: 90px;">To:</label>
+            <div class="col">
+                <input type="email" class="form-control" id="sentTo">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="subject" class="col col-form-label" style="max-width: 90px;">Subject:</label>
+            <div class="col">
+                <input type="password" class="form-control" id="subject">
+            </div>
+        </div>
+        <div class="mb-3">
+            <quill-editor class="w-100 d-block" [style]="{height: '100px'}" [modules]="editorConfig" placeholder=""></quill-editor>
+        </div>
+        <div class="mt-5 pt-3 text-end">
+            <button type="submit" class="btn btn-secondary me-2">Discard</button>
+            <button type="submit" class="btn btn-primary">Sent</button>
+        </div>
+      </form>
+</div>

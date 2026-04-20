@@ -1,0 +1,65 @@
+<div class="mail card mb-0">
+    <div class="d-flex content-min-height content-max-height">
+        <column-panel [borderRight]="true" [panelWidth]="230" class="p-0" [isMobileActive]="showMobilePanel">
+            <div class="mail-panel">
+                <div class="mail-panel-menu">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="p-3">Mailbox</h4>
+                        <div class="me-3 cursor-pointer d-block d-lg-none" (click)="onToggleClick()">
+                            <i class="feather icon-arrow-left font-size-lg" ></i>
+                        </div>
+                    </div>
+                    
+                    <div class="columns-panel-item-group">
+                        <a 
+                            *ngFor="let item of categories"
+                            href="javascript:void(0)"
+                            class="columns-panel-item columns-panel-item-link"
+                            [class.active]="selectedGroup === item.value"
+                            (click)="getCategory(item.value)"
+                        >
+                            <div class="d-flex align-items-center" >
+                                <i class="feather font-size-lg" [ngClass]="item.icon"></i>
+                                <span class="ms-3">{{item.title}}</span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="mt-4 columns-panel-item-group">
+                        <a 
+                            *ngFor="let item of labels"
+                            href="javascript:void(0)"
+                            class="columns-panel-item columns-panel-item-link"
+                        >
+                            <div class="d-flex align-items-center" >
+                                <span class="badge-dot" [ngStyle]="{'background-color': item.color}"></span>
+                                <span class="ms-3">{{item.title}}</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="mail-panel-footer">
+                    <button class="btn btn-primary d-block w-100" (click)="composeMail()">
+                        <i class="feather icon-plus me-2"></i>
+                        <span>Compose</span>
+                    </button>
+                </div>
+            </div>
+        </column-panel>
+        <mail-list
+            *ngIf="!compose"
+            [selectedMail]="selectedMailId"
+            [showMailContent]="showMailContent" 
+            [data]="mails" 
+            (rowClick)="selectMailData($event)"
+            (onMobilePanelOpen)="onToggleClick()"
+            [ngClass]="{'mobile-hide-list': displayContentMobile}"
+        ></mail-list>
+        <mail-content 
+            [ngClass]="{'mobile-show-content': displayContentMobile}" 
+            *ngIf="showMailContent && !compose" 
+            [mailId]="selectedMailId"
+            (onMobileContentClose)="onMobileContentToggleClick()"
+        ></mail-content>
+        <mail-compose *ngIf="compose"></mail-compose>
+    </div>
+</div>

@@ -1,0 +1,37 @@
+<div class="container">
+    <div class="text-center mt-4">
+        <h3 class="mb-3">Pricing Plan</h3>
+        <p class="mx-auto" style="max-width: 400px;">We have sevaral powerful plans for our service, find yourself a suitable plan from the below price list.</p>
+    </div>
+    <div class="row mt-5">
+        <div class="col-md-4" *ngFor="let plan of pricingPlan; let index = index">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="mb-4">
+                        <span class="fw-bolder">${{plan.price}}</span>
+                        <span class="font-size-base text-muted"> / per month</span>
+                    </h2>
+                    <h4>{{plan.plan}}</h4>
+                    <p>{{plan.desc}}</p>
+                    <ul class="list-unstyled mt-5">
+                        <li class="mb-4 fw-bold" *ngFor="let item of plan.features">
+                            <div 
+                                class="d-inline-block rounded-circle" 
+                                [ngStyle]="{'background-color': hexToRGB(item.avaiable ? '#00c569' : '#0d0b3e' , 0.1)}"
+                            >
+                                <i 
+                                    class="mb-0 px-1 feather icon-check" 
+                                    [ngStyle]="{'color': item.avaiable ? '#00c569' : '#0d0b3e'}"
+                                ></i>
+                            </div>
+                            <span class="ms-2" [ngClass]="{'text-muted': !item.avaiable}">{{item.feat}}</span>
+                        </li>
+                    </ul>
+                    <div class="mt-5">
+                        <button class="btn btn-block" [ngClass]="index === 1 ? 'btn-primary' : 'btn-outline-primary'">Get Started</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

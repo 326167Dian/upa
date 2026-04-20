@@ -1,0 +1,19 @@
+<div class="alert"
+    [ngClass]="{
+        'alert-success': status === 'success', 
+        'alert-danger': status === 'fail'
+    }"
+    *ngIf="showMessage"
+    @fadeInOut
+>
+    {{message}}
+</div>
+<upload
+    action="/api/upload"
+    accept="image/png, image/jpeg"
+    [showFileList]="false"
+    [avatar]="true"
+    [imageUrl]="imageUrl"
+    (success)="successHandle($event)"
+    (error)="errorHandle($event)">
+</upload>

@@ -1,0 +1,45 @@
+<div>
+    <div>
+        <h4>Environment Setup</h4>
+        <p>Espire required some prerequisite, you many need to install the following tools before starting the app.</p>
+        <div class="d-flex mt-4">
+            <div> - </div>
+            <div class=" ms-3 fw-bold">
+                <a href="https://nodejs.org/en/" target="_blank" rel="noopener noreferrer">Node.js </a>
+            </div>
+        </div>
+        <div class="d-flex mt-2">
+            <div> - </div>
+            <div class=" ms-3 fw-bold">
+                <a href="https://cli.angular.io/" target="_blank" rel="noopener noreferrer">Angular CLI</a>
+            </div>
+        </div>
+    </div>
+    <div class="mt-5">
+        <h4>Installing Packages</h4>
+        <p>
+            Navigate to project root directory where <code>package.json</code> located and execute the code below to install all necessary dependencies.       
+        </p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="'npm install'"></pre>
+    </div>
+    <div class="mt-5">
+        <h4>Start Development Server</h4>
+        <p>Run the code below for a dev server. Navigate to <code>http://localhost:4200/</code> to view the output.</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="'npm run start'"></pre>
+    </div>
+    <div class="mt-5">
+        <h4>Deployment</h4>
+        <p>To build your application for production, run the following command, the build artifacts will be stored in the <strong>/dist</strong> directory</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="'npm run build-prod'"></pre>
+    </div>
+    <div class="mt-5">
+        <h4>Analyze Bundle</h4>
+        <p>You can analyze your bundle size by running the following command, this will generate a bundle stats.json</p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="'npm run build-prod-state'"></pre>
+    </div>
+    <div class="mt-5">
+        <h4>Bundle Report</h4>
+        <p>Generate a bundle report by running the following command, once <strong>'npm run build-prod-state'</strong> was finished. </p>
+        <pre class="prettyprint lang-typescript" [innerHTML]="'npm run bundle-report'"></pre>
+    </div>
+</div>

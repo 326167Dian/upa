@@ -1,0 +1,53 @@
+{
+  "_from": "@amcharts/amcharts4-geodata@^4.1.19",
+  "_id": "@amcharts/amcharts4-geodata@4.1.19",
+  "_inBundle": false,
+  "_integrity": "sha512-y100J6mp8H95qfHPPmeAat8oC+VXJrpt+rnwOt554sEW6cFCWY6BKgPKL2dVlVbnz0U3dqNsyENOqXmp3Pu7vg==",
+  "_location": "/@amcharts/amcharts4-geodata",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "@amcharts/amcharts4-geodata@^4.1.19",
+    "name": "@amcharts/amcharts4-geodata",
+    "escapedName": "@amcharts%2famcharts4-geodata",
+    "scope": "@amcharts",
+    "rawSpec": "^4.1.19",
+    "saveSpec": null,
+    "fetchSpec": "^4.1.19"
+  },
+  "_requiredBy": [
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/@amcharts/amcharts4-geodata/-/amcharts4-geodata-4.1.19.tgz",
+  "_shasum": "aa36f673ea3563e3f5549645db8ff85736b7f2ce",
+  "_spec": "@amcharts/amcharts4-geodata@^4.1.19",
+  "_where": "C:\\Users\\E\\Desktop\\workspace\\espire\\angular",
+  "author": {
+    "name": "amCharts",
+    "email": "contact@amcharts.com",
+    "url": "https://www.amcharts.com/"
+  },
+  "bugs": {
+    "url": "https://www.amcharts.com/support/",
+    "email": "contact@amcharts.com"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "amCharts 4 Geo Data",
+  "homepage": "https://www.amcharts.com/",
+  "keywords": [
+    "amcharts",
+    "javascript",
+    "charts",
+    "typescript",
+    "geodata"
+  ],
+  "license": "SEE LICENSE IN LICENSE",
+  "name": "@amcharts/amcharts4-geodata",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amcharts/amcharts4-geodata.git"
+  },
+  "version": "4.1.19"
+}

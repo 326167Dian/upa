@@ -1,0 +1,14 @@
+<ngx-datatable
+    class="selection-cell"
+    [rows]="rows"
+    [columnMode]="ColumnMode.force"
+    [columns]="columns"
+    [headerHeight]="50"
+    [footerHeight]="50"
+    rowHeight="auto"
+    [selected]="selected"
+    [selectionType]="SelectionType.cell"
+    (select)="onSelect($event)"
+    (activate)="onActivate($event)"
+>
+</ngx-datatable>
