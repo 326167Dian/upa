@@ -25,7 +25,9 @@
                             @forelse ($kegiatan as $item)
                                 <tr>
                                     <td>{{ $item->nama_kegiatan }}</td>
-                                    <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->deskripsi)), 120) }}</td>
+                                    <td>
+                                        <div class="wysiwyg-preview">{!! html_entity_decode($item->deskripsi) !!}</div>
+                                    </td>
                                     <td>{{ $item->operator?->name ?? '-' }}</td>
                                     <td class="text-end">
                                         <a href="{{ route('kegiatan.edit', $item) }}" class="btn btn-sm btn-outline-primary">Edit</a>

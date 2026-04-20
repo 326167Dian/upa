@@ -25,4 +25,9 @@ class Operator extends Model
     {
         return $this->hasMany(Kegiatan::class, 'id', 'id');
     }
+
+    public function kehadiran(): HasMany
+    {
+        return $this->hasMany(Kehadiran::class, 'id', 'id');
+    }
 }

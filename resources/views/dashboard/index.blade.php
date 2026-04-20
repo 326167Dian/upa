@@ -81,6 +81,18 @@
         </div>
 
         <div class="row mt-4">
+            <div class="col-md-12 col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <p class="mb-1 text-muted">Total Kehadiran</p>
+                        <h3 class="mb-2">{{ $kehadiranCount }}</h3>
+                        <p class="mb-0">Kelola absensi operator pada setiap kegiatan dari menu Kehadiran.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
             <div class="col-md-12 col-lg-6">
                 <div class="card">
                     <div class="card-body">
@@ -88,6 +100,7 @@
                         <div class="d-flex gap-2 flex-wrap">
                             <a href="{{ route('operators.create') }}" class="btn btn-primary">Tambah Operator</a>
                             <a href="{{ route('kegiatan.create') }}" class="btn btn-outline-primary">Tambah Kegiatan</a>
+                            <a href="{{ route('kehadiran.create') }}" class="btn btn-outline-primary">Tambah Kehadiran</a>
                         </div>
                     </div>
                 </div>
@@ -178,12 +191,54 @@
                             @forelse ($latestKegiatan as $item)
                                 <tr>
                                     <td>{{ $item->nama_kegiatan }}</td>
-                                    <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->deskripsi)), 90) }}</td>
+                                    <td>
+                                        <div class="wysiwyg-preview">{!! html_entity_decode($item->deskripsi) !!}</div>
+                                    </td>
                                     <td>{{ $item->operator?->name ?? '-' }}</td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="3" class="text-center text-muted">Belum ada data kegiatan.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Kehadiran Terbaru</h4>
+                    <a href="{{ route('kehadiran.index') }}" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Operator</th>
+                                <th>Kegiatan</th>
+                                <th>Waktu</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($latestKehadiran as $item)
+                                <tr>
+                                    <td>{{ $item->operator?->name ?? '-' }}</td>
+                                    <td>{{ $item->kegiatan?->nama_kegiatan ?? '-' }}</td>
+                                    <td>{{ optional($item->waktu)->format('d M Y H:i') ?? '-' }}</td>
+                                    <td>
+                                        <span class="badge {{ $item->hadir === 1 ? 'bg-success' : 'bg-danger' }}">
+                                            {{ $item->hadir === 1 ? 'Hadir' : 'Tidak Hadir' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Belum ada data kehadiran.</td>
                                 </tr>
                             @endforelse
                         </tbody>

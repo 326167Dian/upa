@@ -27,6 +27,31 @@
             margin-left: 0.5rem;
         }
 
+        .wysiwyg-preview {
+            min-width: 260px;
+            max-width: 520px;
+            white-space: normal;
+            line-height: 1.6;
+            color: #455560;
+        }
+
+        .wysiwyg-preview p,
+        .wysiwyg-preview ul,
+        .wysiwyg-preview ol {
+            margin-bottom: 0.5rem;
+        }
+
+        .wysiwyg-preview p:last-child,
+        .wysiwyg-preview ul:last-child,
+        .wysiwyg-preview ol:last-child {
+            margin-bottom: 0;
+        }
+
+        .wysiwyg-preview ul,
+        .wysiwyg-preview ol {
+            padding-left: 1.25rem;
+        }
+
         @media only screen and (min-width: 992px) {
             .side-nav.auto-hide-ready {
                 transition: width 0.2s ease;
@@ -120,6 +145,12 @@
                         <a href="{{ route('kegiatan.index') }}">
                             <i class="feather icon-clipboard"></i>
                             <span class="nav-menu-item-title">Kegiatan</span>
+                        </a>
+                    </li>
+                    <li class="nav-menu-item {{ request()->routeIs('kehadiran.*') ? 'router-link-active' : '' }}">
+                        <a href="{{ route('kehadiran.index') }}">
+                            <i class="feather icon-check-square"></i>
+                            <span class="nav-menu-item-title">Kehadiran</span>
                         </a>
                     </li>
                 </ul>
