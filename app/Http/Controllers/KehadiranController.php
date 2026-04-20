@@ -16,7 +16,7 @@ class KehadiranController extends Controller
         return view('kehadiran.index', [
             'kehadiran' => Kehadiran::with(['operator', 'kegiatan'])
                 ->latest('id_kehadiran')
-                ->paginate(10),
+                ->get(),
         ]);
     }
 

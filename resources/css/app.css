@@ -10,3 +10,24 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+.dt-container .dt-search,
+.dt-container .dt-length {
+    margin-bottom: 1rem;
+}
+
+.dt-container .dt-search input,
+.dt-container .dt-length select {
+    border: 1px solid #d9e2ec;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.dt-container .pagination {
+    margin-top: 1rem;
+}
+
+.dt-container .dt-info {
+    padding-top: 0.75rem;
+    color: #6b7c93;
+}

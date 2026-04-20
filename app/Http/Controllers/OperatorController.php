@@ -29,8 +29,7 @@ class OperatorController extends Controller
                     $query->where('role', $role);
                 })
                 ->latest()
-                ->paginate(10)
-                ->withQueryString(),
+                ->get(),
             'filters' => [
                 'search' => $search,
                 'role' => $role,

@@ -143,7 +143,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" data-datatable="true" data-page-length="5">
                         <thead>
                             <tr>
                                 <th>Nama</th>
@@ -179,7 +179,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" data-datatable="true" data-page-length="5">
                         <thead>
                             <tr>
                                 <th>Nama Kegiatan</th>
@@ -215,7 +215,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" data-datatable="true" data-page-length="5">
                         <thead>
                             <tr>
                                 <th>Operator</th>

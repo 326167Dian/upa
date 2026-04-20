@@ -40,7 +40,7 @@
                 </form>
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover" data-datatable="true" data-disable-last-column-sort="true">
                         <thead>
                             <tr>
                                 <th>Nama</th>
@@ -75,10 +75,6 @@
                             @endforelse
                         </tbody>
                     </table>
-                </div>
-
-                <div class="mt-3">
-                    {{ $operators->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

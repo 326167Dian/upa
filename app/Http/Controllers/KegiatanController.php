@@ -13,7 +13,7 @@ class KegiatanController extends Controller
     public function index(): View
     {
         return view('kegiatan.index', [
-            'kegiatan' => Kegiatan::with('operator')->latest('id_kegiatan')->paginate(10),
+            'kegiatan' => Kegiatan::with('operator')->latest('id_kegiatan')->get(),
         ]);
     }
 
