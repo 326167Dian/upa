@@ -116,6 +116,12 @@
                             <span class="nav-menu-item-title">Operator</span>
                         </a>
                     </li>
+                    <li class="nav-menu-item {{ request()->routeIs('kegiatan.*') ? 'router-link-active' : '' }}">
+                        <a href="{{ route('kegiatan.index') }}">
+                            <i class="feather icon-clipboard"></i>
+                            <span class="nav-menu-item-title">Kegiatan</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 

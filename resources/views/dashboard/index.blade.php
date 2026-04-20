@@ -72,8 +72,23 @@
             <div class="col-md-12 col-lg-4">
                 <div class="card">
                     <div class="card-body">
+                        <p class="mb-1 text-muted">Total Kegiatan</p>
+                        <h3 class="mb-2">{{ $kegiatanCount }}</h3>
+                        <p class="mb-0">Pantau dan kelola kegiatan dari menu Kegiatan.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12 col-lg-6">
+                <div class="card">
+                    <div class="card-body">
                         <p class="mb-2 text-muted">Akses Cepat</p>
-                        <a href="{{ route('operators.create') }}" class="btn btn-primary">Tambah Operator</a>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ route('operators.create') }}" class="btn btn-primary">Tambah Operator</a>
+                            <a href="{{ route('kegiatan.create') }}" class="btn btn-outline-primary">Tambah Kegiatan</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -135,6 +150,40 @@
                             @empty
                                 <tr>
                                     <td colspan="4" class="text-center text-muted">Belum ada data operator.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0">Kegiatan Terbaru</h4>
+                    <a href="{{ route('kegiatan.index') }}" class="btn btn-outline-primary btn-sm">Lihat Semua</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Nama Kegiatan</th>
+                                <th>Deskripsi</th>
+                                <th>Operator</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($latestKegiatan as $item)
+                                <tr>
+                                    <td>{{ $item->nama_kegiatan }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->deskripsi)), 90) }}</td>
+                                    <td>{{ $item->operator?->name ?? '-' }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Belum ada data kegiatan.</td>
                                 </tr>
                             @endforelse
                         </tbody>
