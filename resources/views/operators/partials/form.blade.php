@@ -52,6 +52,7 @@
         id="full_address"
         name="full_address"
         rows="4"
+        data-rich-text="ckeditor"
         class="form-control @error('full_address') is-invalid @enderror"
         placeholder="Masukkan alamat lengkap"
     >{{ old('full_address', $operator->full_address) }}</textarea>

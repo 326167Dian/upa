@@ -145,6 +145,7 @@
 
     <script src="{{ $espireAsset('js/vendors.min.js') }}"></script>
     <script src="{{ $espireAsset('js/app.min.js') }}"></script>
+    @vite(['resources/js/app.js'])
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('app-sidebar');

@@ -56,7 +56,7 @@
                                     <td>{{ $operator->name }}</td>
                                     <td><span class="badge bg-info text-dark text-uppercase">{{ $operator->role }}</span></td>
                                     <td>{{ $operator->phone_number }}</td>
-                                    <td>{{ $operator->full_address }}</td>
+                                    <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($operator->full_address)), 90) }}</td>
                                     <td class="text-end">
                                         <a href="{{ route('operators.edit', $operator) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                                         @if (auth()->user()->role === 'admin')
