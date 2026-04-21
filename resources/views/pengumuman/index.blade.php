@@ -32,17 +32,35 @@
                                     <td>{{ $item->operator?->name ?? '-' }}</td>
                                     <td>{{ $item->created_at?->format('d-m-Y H:i') ?? '-' }}</td>
                                     <td class="text-end">
-                                        @if (auth()->user()?->hasFeatureAccess('pengumuman.edit'))
-                                            <a href="{{ route('pengumuman.edit', $item) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        @endif
-                                        @if (auth()->user()?->hasFeatureAccess('pengumuman.delete'))
-                                            <form method="POST" action="{{ route('pengumuman.destroy', $item) }}" class="d-inline-block" onsubmit="return confirm('Hapus pengumuman ini?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                            </form>
-                                        @endif
-                                        @if (! auth()->user()?->hasFeatureAccess('pengumuman.edit') && ! auth()->user()?->hasFeatureAccess('pengumuman.delete'))
+                                        @if (auth()->user()?->hasFeatureAccess('pengumuman.edit') || auth()->user()?->hasFeatureAccess('pengumuman.delete'))
+                                            <div class="dropdown d-inline-block">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="pengumuman-action-{{ $item->id_pengumuman }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Aksi
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pengumuman-action-{{ $item->id_pengumuman }}">
+                                                    @if (auth()->user()?->hasFeatureAccess('pengumuman.edit'))
+                                                        <li class="px-2 py-1">
+                                                            <a href="{{ route('pengumuman.edit', $item) }}" class="dropdown-item rounded d-flex align-items-center gap-2" style="background-color: #fff3bf; color: #7a4b00;">
+                                                                <i class="feather icon-edit-2"></i>
+                                                                <span>Edit</span>
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                    @if (auth()->user()?->hasFeatureAccess('pengumuman.delete'))
+                                                        <li class="px-2 py-1">
+                                                            <form method="POST" action="{{ route('pengumuman.destroy', $item) }}" onsubmit="return confirm('Hapus pengumuman ini?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item rounded d-flex align-items-center gap-2 w-100" style="background-color: #ffd6d6; color: #a61e1e;">
+                                                                    <i class="feather icon-trash-2"></i>
+                                                                    <span>Hapus</span>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                            </div>
+                                        @else
                                             <span class="text-muted">Lihat Saja</span>
                                         @endif
                                     </td>

@@ -38,15 +38,34 @@
                                     </td>
                                     <td>{{ $item->keterangan ?: '-' }}</td>
                                     <td class="text-end">
-                                        @if (auth()->user()?->hasFeatureAccess('kehadiran.edit'))
-                                            <a href="{{ route('kehadiran.edit', $item) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        @endif
-                                        @if (auth()->user()?->hasFeatureAccess('kehadiran.delete'))
-                                            <form method="POST" action="{{ route('kehadiran.destroy', $item) }}" class="d-inline-block" onsubmit="return confirm('Hapus data kehadiran ini?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                            </form>
+                                        @if (auth()->user()?->hasFeatureAccess('kehadiran.edit') || auth()->user()?->hasFeatureAccess('kehadiran.delete'))
+                                            <div class="dropdown d-inline-block">
+                                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="kehadiran-action-{{ $item->id_kehadiran }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Aksi
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="kehadiran-action-{{ $item->id_kehadiran }}">
+                                                    @if (auth()->user()?->hasFeatureAccess('kehadiran.edit'))
+                                                        <li class="px-2 py-1">
+                                                            <a href="{{ route('kehadiran.edit', $item) }}" class="dropdown-item rounded d-flex align-items-center gap-2" style="background-color: #fff3bf; color: #7a4b00;">
+                                                                <i class="feather icon-edit-2"></i>
+                                                                <span>Edit</span>
+                                                            </a>
+                                                        </li>
+                                                    @endif
+                                                    @if (auth()->user()?->hasFeatureAccess('kehadiran.delete'))
+                                                        <li class="px-2 py-1">
+                                                            <form method="POST" action="{{ route('kehadiran.destroy', $item) }}" onsubmit="return confirm('Hapus data kehadiran ini?');">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="dropdown-item rounded d-flex align-items-center gap-2 w-100" style="background-color: #ffd6d6; color: #a61e1e;">
+                                                                    <i class="feather icon-trash-2"></i>
+                                                                    <span>Hapus</span>
+                                                                </button>
+                                                            </form>
+                                                        </li>
+                                                    @endif
+                                                </ul>
+                                            </div>
                                         @endif
                                     </td>
                                 </tr>
