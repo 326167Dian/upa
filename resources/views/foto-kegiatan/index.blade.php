@@ -30,7 +30,21 @@
                                 <tr>
                                     <td>{{ $item->kegiatan?->nama_kegiatan ?? '-' }}</td>
                                     <td>
-                                        <img src="{{ asset('storage/'.$item->foto) }}" alt="Foto kegiatan" class="rounded border" style="width: 84px; height: 84px; object-fit: cover;">
+                                        @php
+                                            $photoUrl = asset('storage/'.$item->foto);
+                                            $modalId = 'foto-kegiatan-modal-'.$item->id_foto_kegiatan;
+                                        @endphp
+                                        <div class="d-inline-flex flex-column align-items-start gap-2">
+                                            <img src="{{ $photoUrl }}" alt="Foto kegiatan" class="rounded border" style="width: 84px; height: 84px; object-fit: cover;">
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#{{ $modalId }}">
+                                                    Show
+                                                </button>
+                                                <a href="{{ route('foto-kegiatan.download', $item) }}" class="btn btn-sm btn-outline-success">
+                                                    Download
+                                                </a>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->keterangan)), 120) }}</td>
                                     <td>{{ $item->operator?->name ?? '-' }}</td>
@@ -57,5 +71,32 @@
                 @endif
             </div>
         </div>
+
+        @foreach ($fotoKegiatan as $item)
+            @php
+                $photoUrl = asset('storage/'.$item->foto);
+                $modalId = 'foto-kegiatan-modal-'.$item->id_foto_kegiatan;
+            @endphp
+            <div class="modal fade" id="{{ $modalId }}" tabindex="-1" aria-labelledby="{{ $modalId }}-label" aria-hidden="true">
+                <div class="modal-dialog modal-fullscreen">
+                    <div class="modal-content bg-dark border-0">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title text-white" id="{{ $modalId }}-label">
+                                {{ $item->kegiatan?->nama_kegiatan ?? 'Foto Kegiatan' }}
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('foto-kegiatan.download', $item) }}" class="btn btn-sm btn-success">
+                                    Download
+                                </a>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                        </div>
+                        <div class="modal-body d-flex align-items-center justify-content-center p-4">
+                            <img src="{{ $photoUrl }}" alt="Foto kegiatan" class="img-fluid rounded shadow" style="max-width: 100%; max-height: calc(100vh - 140px); object-fit: contain;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endforeach
     </div>
 @endsection

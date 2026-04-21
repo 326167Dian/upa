@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/pengumuman/upload-image', [PengumumanController::class, 'uploadImage'])->name('pengumuman.upload-image');
 
     Route::get('/foto-kegiatan', [FotoKegiatanController::class, 'index'])->middleware('feature:foto_kegiatan.view')->name('foto-kegiatan.index');
+    Route::get('/foto-kegiatan/{fotoKegiatan}/download', [FotoKegiatanController::class, 'download'])->name('foto-kegiatan.download');
     Route::get('/foto-kegiatan/create', [FotoKegiatanController::class, 'create'])->middleware('feature:foto_kegiatan.create')->name('foto-kegiatan.create');
     Route::post('/foto-kegiatan', [FotoKegiatanController::class, 'store'])->middleware('feature:foto_kegiatan.create')->name('foto-kegiatan.store');
     Route::get('/foto-kegiatan/{fotoKegiatan}/edit', [FotoKegiatanController::class, 'edit'])->middleware('feature:foto_kegiatan.edit')->name('foto-kegiatan.edit');

@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\FotoKegiatan;
 use App\Models\Kegiatan;
 use App\Models\Operator;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class FotoKegiatanController extends Controller
@@ -48,6 +50,19 @@ class FotoKegiatanController extends Controller
             'fotoKegiatan' => $fotoKegiatan,
             'kegiatanList' => Kegiatan::orderBy('nama_kegiatan')->get(),
         ]);
+    }
+
+    public function download(FotoKegiatan $fotoKegiatan): BinaryFileResponse
+    {
+        abort_unless($fotoKegiatan->foto && Storage::disk('public')->exists($fotoKegiatan->foto), 404);
+
+        $extension = pathinfo($fotoKegiatan->foto, PATHINFO_EXTENSION);
+        $filename = Str::slug($fotoKegiatan->kegiatan?->nama_kegiatan ?? 'foto-kegiatan');
+
+        return response()->download(
+            Storage::disk('public')->path($fotoKegiatan->foto),
+            $filename.($extension ? '.'.$extension : '')
+        );
     }
 
     public function update(Request $request, FotoKegiatan $fotoKegiatan): RedirectResponse
