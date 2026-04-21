@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\JenisJurnal;
+use App\Models\Kas;
 use App\Models\Kegiatan;
 use App\Models\Operator;
 use App\Models\User;
@@ -36,8 +38,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $adminOperator = Operator::updateOrCreate([
-            'user_id' => $adminUser->id,
+            'username' => 'mysifa',
         ], [
+            'user_id' => $adminUser->id,
             'name' => 'mysifa',
             'username' => 'mysifa',
             'password' => $adminUser->password,
@@ -47,8 +50,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $userOperator = Operator::updateOrCreate([
-            'user_id' => $userAccount->id,
+            'username' => 'operatoruser',
         ], [
+            'user_id' => $userAccount->id,
             'name' => 'Operator User',
             'username' => 'operatoruser',
             'password' => $userAccount->password,
@@ -89,9 +93,10 @@ class DatabaseSeeder extends Seeder
             ]);
 
             Operator::updateOrCreate([
-                'user_id' => $user->id,
+                'username' => $username,
             ], [
                 ...$operator,
+                'user_id' => $user->id,
                 'username' => $username,
                 'password' => $user->password,
             ]);
@@ -112,6 +117,29 @@ class DatabaseSeeder extends Seeder
             Kegiatan::updateOrCreate([
                 'nama_kegiatan' => $kegiatan['nama_kegiatan'],
             ], $kegiatan);
+        }
+
+        Kas::updateOrCreate([
+            'id_kas' => 1,
+        ], [
+            'saldo' => 0,
+            'created_by' => now(),
+            'update_at' => $adminOperator->id,
+        ]);
+
+        foreach ([
+            ['nm_jurnal' => 'Pembelian Operasional', 'tipe' => 1],
+            ['nm_jurnal' => 'Pengeluaran Lainnya', 'tipe' => 1],
+            ['nm_jurnal' => 'Pemasukan Transfer', 'tipe' => 2],
+            ['nm_jurnal' => 'Pemasukan Tunai', 'tipe' => 2],
+        ] as $jenisJurnal) {
+            JenisJurnal::updateOrCreate([
+                'nm_jurnal' => $jenisJurnal['nm_jurnal'],
+            ], [
+                ...$jenisJurnal,
+                'created_by' => now(),
+                'update_at' => $adminOperator->id,
+            ]);
         }
     }
 }

@@ -235,6 +235,12 @@
                             <span class="nav-menu-item-title">Kehadiran</span>
                         </a>
                     </li>
+                    <li class="nav-menu-item {{ request()->routeIs('jurnal-kas.*') ? 'router-link-active' : '' }}">
+                        <a href="{{ route('jurnal-kas.index') }}">
+                            <i class="feather icon-book-open"></i>
+                            <span class="nav-menu-item-title">Jurnal Kas</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 

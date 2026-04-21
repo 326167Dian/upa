@@ -35,6 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
 			return;
 		}
 
+		const tableBody = table.tBodies[0];
+
+		if (tableBody) {
+			const bodyRows = Array.from(tableBody.rows);
+			const containsOnlyPlaceholderRows = bodyRows.length > 0 && bodyRows.every((row) => {
+				return row.cells.length === 1 && row.cells[0].hasAttribute('colspan');
+			});
+
+			if (containsOnlyPlaceholderRows) {
+				tableBody.innerHTML = '';
+			}
+		}
+
 		const disableLastColumnSort = table.dataset.disableLastColumnSort === 'true';
 		const lastColumnIndex = table.querySelectorAll('thead th').length - 1;
 		const columnDefs = [];
