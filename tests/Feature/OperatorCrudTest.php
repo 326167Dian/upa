@@ -129,9 +129,12 @@ class OperatorCrudTest extends TestCase
         ]);
     }
 
-    public function test_non_admin_cannot_delete_operator(): void
+    public function test_custom_user_without_delete_permission_cannot_delete_operator(): void
     {
-        $user = User::factory()->create(['role' => 'user']);
+        $user = User::factory()->create([
+            'role' => User::ROLE_CUSTOM,
+            'permissions' => ['operators.view', 'dashboard.view'],
+        ]);
         $operator = Operator::create([
             'name' => 'Operator Aman',
             'username' => 'operatoraman',
@@ -143,7 +146,7 @@ class OperatorCrudTest extends TestCase
 
         $response = $this->actingAs($user)->delete(route('operators.destroy', $operator));
 
-        $response->assertRedirect(route('operators.index'));
+        $response->assertRedirect(route('dashboard'));
         $response->assertSessionHas('error');
         $this->assertDatabaseHas('operators', [
             'id' => $operator->id,

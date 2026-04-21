@@ -3,6 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="ckeditor-upload-url" content="{{ route('pengumuman.upload-image') }}">
     <title>{{ $title ?? 'Dashboard' }}</title>
 
     @php
@@ -211,36 +213,54 @@
                     </div>
                 </div>
                 <ul class="nav-menu">
-                    <li class="nav-menu-item {{ request()->routeIs('dashboard') ? 'router-link-active' : '' }}">
-                        <a href="{{ route('dashboard') }}">
-                            <i class="feather icon-home"></i>
-                            <span class="nav-menu-item-title">Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="nav-menu-item {{ request()->routeIs('operators.*') ? 'router-link-active' : '' }}">
-                        <a href="{{ route('operators.index') }}">
-                            <i class="feather icon-users"></i>
-                            <span class="nav-menu-item-title">Operator</span>
-                        </a>
-                    </li>
-                    <li class="nav-menu-item {{ request()->routeIs('kegiatan.*') ? 'router-link-active' : '' }}">
-                        <a href="{{ route('kegiatan.index') }}">
-                            <i class="feather icon-clipboard"></i>
-                            <span class="nav-menu-item-title">Kegiatan</span>
-                        </a>
-                    </li>
-                    <li class="nav-menu-item {{ request()->routeIs('kehadiran.*') ? 'router-link-active' : '' }}">
-                        <a href="{{ route('kehadiran.index') }}">
-                            <i class="feather icon-check-square"></i>
-                            <span class="nav-menu-item-title">Kehadiran</span>
-                        </a>
-                    </li>
-                    <li class="nav-menu-item {{ request()->routeIs('jurnal-kas.*') ? 'router-link-active' : '' }}">
-                        <a href="{{ route('jurnal-kas.index') }}">
-                            <i class="feather icon-book-open"></i>
-                            <span class="nav-menu-item-title">Jurnal Kas</span>
-                        </a>
-                    </li>
+                    @if (auth()->user()->hasFeatureAccess('dashboard.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('dashboard') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('dashboard') }}">
+                                <i class="feather icon-home"></i>
+                                <span class="nav-menu-item-title">Dashboard</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->hasFeatureAccess('operators.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('operators.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('operators.index') }}">
+                                <i class="feather icon-users"></i>
+                                <span class="nav-menu-item-title">Operator</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->hasFeatureAccess('kegiatan.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('kegiatan.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('kegiatan.index') }}">
+                                <i class="feather icon-clipboard"></i>
+                                <span class="nav-menu-item-title">Kegiatan</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->hasFeatureAccess('kehadiran.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('kehadiran.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('kehadiran.index') }}">
+                                <i class="feather icon-check-square"></i>
+                                <span class="nav-menu-item-title">Kehadiran</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->hasFeatureAccess('jurnal_kas.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('jurnal-kas.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('jurnal-kas.index') }}">
+                                <i class="feather icon-book-open"></i>
+                                <span class="nav-menu-item-title">Jurnal Kas</span>
+                            </a>
+                        </li>
+                    @endif
+                    @if (auth()->user()->hasFeatureAccess('pengumuman.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('pengumuman.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('pengumuman.index') }}">
+                                <i class="feather icon-volume-2"></i>
+                                <span class="nav-menu-item-title">Pengumuman</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
 

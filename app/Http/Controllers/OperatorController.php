@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Operator;
 use App\Models\User;
+use App\Support\FeaturePermission;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -19,27 +20,33 @@ class OperatorController extends Controller
     {
         $search = trim((string) $request->string('search'));
         $role = (string) $request->string('role');
+        $operators = Operator::query()
+            ->when($search !== '', function (Builder $query) use ($search) {
+                $query->where(function (Builder $nestedQuery) use ($search) {
+                    $nestedQuery
+                        ->where('name', 'like', '%'.$search.'%')
+                        ->orWhere('username', 'like', '%'.$search.'%')
+                        ->orWhere('phone_number', 'like', '%'.$search.'%')
+                        ->orWhere('full_address', 'like', '%'.$search.'%');
+                });
+            })
+            ->when(in_array($role, [User::ROLE_ADMIN, User::ROLE_USER, User::ROLE_CUSTOM], true), function (Builder $query) use ($role) {
+                $query->where('role', $role);
+            })
+            ->latest()
+            ->get();
 
         return view('operators.index', [
-            'operators' => Operator::query()
-                ->when($search !== '', function (Builder $query) use ($search) {
-                    $query->where(function (Builder $nestedQuery) use ($search) {
-                        $nestedQuery
-                            ->where('name', 'like', '%'.$search.'%')
-                            ->orWhere('username', 'like', '%'.$search.'%')
-                            ->orWhere('phone_number', 'like', '%'.$search.'%')
-                            ->orWhere('full_address', 'like', '%'.$search.'%');
-                    });
-                })
-                ->when(in_array($role, ['admin', 'user'], true), function (Builder $query) use ($role) {
-                    $query->where('role', $role);
-                })
-                ->latest()
-                ->get(),
+            'operators' => $operators,
             'filters' => [
                 'search' => $search,
                 'role' => $role,
             ],
+            'featureDefinitions' => FeaturePermission::definitions(),
+            'permissionSummaries' => $operators
+                ->mapWithKeys(fn (Operator $operator) => [
+                    $operator->id => FeaturePermission::summarize($operator->permissions),
+                ]),
         ]);
     }
 
@@ -47,6 +54,7 @@ class OperatorController extends Controller
     {
         return view('operators.create', [
             'operator' => new Operator(),
+            'featureDefinitions' => FeaturePermission::definitions(),
         ]);
     }
 
@@ -54,6 +62,7 @@ class OperatorController extends Controller
     {
         $data = $this->validatedData($request);
         DB::transaction(function () use ($data): void {
+            $permissions = $this->normalizePermissions((string) $data['role'], $data['permissions'] ?? []);
             $passwordHash = Hash::make($data['password']);
             $user = $this->upsertOperatorUser($data, null, $passwordHash);
 
@@ -61,6 +70,7 @@ class OperatorController extends Controller
                 ...Arr::except($data, ['password']),
                 'user_id' => $user->id,
                 'password' => $passwordHash,
+                'permissions' => $permissions,
             ]);
         });
 
@@ -73,7 +83,21 @@ class OperatorController extends Controller
     {
         return view('operators.edit', [
             'operator' => $operator,
+            'featureDefinitions' => FeaturePermission::definitions(),
         ]);
+    }
+
+    public function show(int $operator): RedirectResponse
+    {
+        $existingOperator = Operator::find($operator);
+
+        if (! $existingOperator) {
+            return redirect()
+                ->route('operators.index')
+                ->with('error', 'Operator yang diminta tidak ditemukan atau sudah dihapus.');
+        }
+
+        return redirect()->route('operators.edit', $existingOperator);
     }
 
     public function update(Request $request, Operator $operator): RedirectResponse
@@ -81,6 +105,7 @@ class OperatorController extends Controller
         $data = $this->validatedData($request, $operator);
 
         DB::transaction(function () use ($data, $operator): void {
+            $permissions = $this->normalizePermissions((string) $data['role'], $data['permissions'] ?? []);
             $passwordHash = filled($data['password'] ?? null)
                 ? Hash::make($data['password'])
                 : $operator->password;
@@ -91,6 +116,7 @@ class OperatorController extends Controller
                 ...Arr::except($data, ['password']),
                 'user_id' => $user->id,
                 'password' => $passwordHash,
+                'permissions' => $permissions,
             ]);
         });
 
@@ -101,12 +127,6 @@ class OperatorController extends Controller
 
     public function destroy(Request $request, Operator $operator): RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('operators.index')
-                ->with('error', 'Hanya admin yang dapat menghapus data operator.');
-        }
-
         DB::transaction(function () use ($operator): void {
             $linkedUser = $operator->user;
 
@@ -137,7 +157,9 @@ class OperatorController extends Controller
                 Rule::unique('users', 'username')->ignore($operator?->user_id),
             ],
             'password' => [$passwordRule, 'string', 'min:8'],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:admin,user,custom'],
+            'permissions' => ['required_if:role,custom', 'array'],
+            'permissions.*' => ['string', Rule::in(FeaturePermission::keys())],
             'phone_number' => ['required', 'string', 'max:30'],
             'full_address' => ['required', 'string'],
         ]);
@@ -149,11 +171,13 @@ class OperatorController extends Controller
     protected function upsertOperatorUser(array $data, ?Operator $operator, string $passwordHash): User
     {
         $user = $operator?->user ?? new User();
+        $permissions = $this->normalizePermissions((string) $data['role'], $data['permissions'] ?? []);
 
         $user->fill([
             'name' => $data['name'],
             'username' => $data['username'],
             'role' => $data['role'],
+            'permissions' => $permissions,
             'email' => $this->operatorEmail((string) $data['username']),
             'password' => $passwordHash,
         ]);
@@ -166,5 +190,22 @@ class OperatorController extends Controller
     protected function operatorEmail(string $username): string
     {
         return strtolower($username).'@upa.local';
+    }
+
+    /**
+     * @param  array<int, string>  $permissions
+     * @return array<int, string>
+     */
+    protected function normalizePermissions(string $role, array $permissions): array
+    {
+        if ($role === User::ROLE_ADMIN) {
+            return FeaturePermission::keys();
+        }
+
+        if ($role === User::ROLE_USER) {
+            return FeaturePermission::keys();
+        }
+
+        return array_values(array_intersect(FeaturePermission::keys(), $permissions));
     }
 }

@@ -38,10 +38,11 @@
     <div class="col-md-6">
         <div class="mb-3">
             <label for="role" class="form-label">Role</label>
-            <select id="role" name="role" class="form-control @error('role') is-invalid @enderror">
+            <select id="role" name="role" class="form-control @error('role') is-invalid @enderror" data-role-selector="true" data-permission-scope="#feature-permissions-scope">
                 <option value="">Pilih role</option>
                 <option value="admin" @selected(old('role', $operator->role) === 'admin')>Admin</option>
                 <option value="user" @selected(old('role', $operator->role) === 'user')>User</option>
+                <option value="custom" @selected(old('role', $operator->role) === 'custom')>Akses Terbatas</option>
             </select>
             @error('role')
                 <div class="invalid-feedback">{{ $message }}</div>
@@ -93,6 +94,55 @@
     >{{ old('full_address', $operator->full_address) }}</textarea>
     @error('full_address')
         <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+<div id="feature-permissions-scope" class="mb-4" @if (old('role', $operator->role) !== 'custom') style="display: none;" @endif>
+    <label class="form-label d-block">Hak Akses Fitur</label>
+    <div class="table-responsive border rounded">
+        <table class="table table-sm mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>Fitur</th>
+                    <th class="text-center">Lihat</th>
+                    <th class="text-center">Tambah</th>
+                    <th class="text-center">Edit</th>
+                    <th class="text-center">Hapus</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($featureDefinitions as $moduleKey => $featureDefinition)
+                    <tr>
+                        <td>{{ $featureDefinition['label'] }}</td>
+                        @foreach (['view', 'create', 'edit', 'delete'] as $actionKey)
+                            <td class="text-center">
+                                @if (array_key_exists($actionKey, $featureDefinition['actions']))
+                                    @php($permissionKey = \App\Support\FeaturePermission::permissionKey($moduleKey, $actionKey))
+                                    <div class="form-check d-inline-flex justify-content-center mb-0">
+                                        <input
+                                            id="permission_{{ $moduleKey }}_{{ $actionKey }}"
+                                            name="permissions[]"
+                                            type="checkbox"
+                                            value="{{ $permissionKey }}"
+                                            class="form-check-input"
+                                            @checked(in_array($permissionKey, old('permissions', $operator->permissions ?? []), true))
+                                        >
+                                    </div>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                        @endforeach
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @error('permissions')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
+    @enderror
+    @error('permissions.*')
+        <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
 </div>
 

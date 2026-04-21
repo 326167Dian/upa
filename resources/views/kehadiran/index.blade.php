@@ -5,7 +5,9 @@
         <div class="page-header no-gutters has-tab">
             <div class="d-md-flex align-items-center justify-content-between w-100">
                 <h2 class="font-weight-normal mb-3 mb-md-0">Data Kehadiran</h2>
-                <a href="{{ route('kehadiran.create') }}" class="btn btn-primary">Tambah Kehadiran</a>
+                @if (auth()->user()?->hasFeatureAccess('kehadiran.create'))
+                    <a href="{{ route('kehadiran.create') }}" class="btn btn-primary">Tambah Kehadiran</a>
+                @endif
             </div>
         </div>
 
@@ -36,12 +38,16 @@
                                     </td>
                                     <td>{{ $item->keterangan ?: '-' }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('kehadiran.edit', $item) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <form method="POST" action="{{ route('kehadiran.destroy', $item) }}" class="d-inline-block" onsubmit="return confirm('Hapus data kehadiran ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                        </form>
+                                        @if (auth()->user()?->hasFeatureAccess('kehadiran.edit'))
+                                            <a href="{{ route('kehadiran.edit', $item) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        @endif
+                                        @if (auth()->user()?->hasFeatureAccess('kehadiran.delete'))
+                                            <form method="POST" action="{{ route('kehadiran.destroy', $item) }}" class="d-inline-block" onsubmit="return confirm('Hapus data kehadiran ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

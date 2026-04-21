@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('operators', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('role', ['admin', 'user']);
+            $table->enum('role', ['admin', 'user', 'custom']);
             $table->string('phone_number', 30);
             $table->text('full_address');
             $table->timestamps();

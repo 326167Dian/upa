@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kegiatan;
 use App\Models\Kehadiran;
 use App\Models\Operator;
+use App\Models\Pengumuman;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -20,6 +21,7 @@ class DashboardController extends Controller
             'latestKegiatan' => Kegiatan::with('operator')->latest('id_kegiatan')->take(5)->get(),
             'kehadiranCount' => Kehadiran::count(),
             'latestKehadiran' => Kehadiran::with(['operator', 'kegiatan'])->latest('id_kehadiran')->take(5)->get(),
+            'latestAnnouncement' => Pengumuman::with('operator')->latest('created_at')->first(),
         ]);
     }
 }

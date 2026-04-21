@@ -5,7 +5,9 @@
         <div class="page-header no-gutters has-tab">
             <div class="d-md-flex align-items-center justify-content-between w-100">
                 <h2 class="font-weight-normal mb-3 mb-md-0">Jenis Transaksi Jurnal</h2>
-                <a href="{{ route('jurnal-kas.types.create') }}" class="btn btn-primary">Tambah Jenis Transaksi</a>
+                @if (auth()->user()?->hasFeatureAccess('jurnal_kas.create'))
+                    <a href="{{ route('jurnal-kas.types.create') }}" class="btn btn-primary">Tambah Jenis Transaksi</a>
+                @endif
             </div>
         </div>
 
@@ -32,12 +34,16 @@
                                     <td>{{ $type->tipe === 1 ? 'Keluar' : 'Masuk' }}</td>
                                     <td>{{ $type->operator?->name ?? '-' }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('jurnal-kas.types.edit', $type) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <form method="POST" action="{{ route('jurnal-kas.types.destroy', $type) }}" class="d-inline-block" onsubmit="return confirm('Hapus jenis transaksi ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                        </form>
+                                        @if (auth()->user()?->hasFeatureAccess('jurnal_kas.edit'))
+                                            <a href="{{ route('jurnal-kas.types.edit', $type) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        @endif
+                                        @if (auth()->user()?->hasFeatureAccess('jurnal_kas.delete'))
+                                            <form method="POST" action="{{ route('jurnal-kas.types.destroy', $type) }}" class="d-inline-block" onsubmit="return confirm('Hapus jenis transaksi ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

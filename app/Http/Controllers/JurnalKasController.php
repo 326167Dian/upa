@@ -117,23 +117,11 @@ class JurnalKasController extends Controller
 
     public function reportFilter(Request $request): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Menu laporan tanggal hanya tersedia untuk admin.');
-        }
-
         return view('jurnal-kas.report-filter');
     }
 
     public function report(Request $request): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Menu laporan tanggal hanya tersedia untuk admin.');
-        }
-
         $data = $request->validate([
             'tgl_awal' => ['required', 'date'],
             'tgl_akhir' => ['required', 'date', 'after_or_equal:tgl_awal'],
@@ -152,23 +140,11 @@ class JurnalKasController extends Controller
 
     public function recapFilter(Request $request): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Menu rekapitulasi hanya tersedia untuk admin.');
-        }
-
         return view('jurnal-kas.recap-filter');
     }
 
     public function recap(Request $request): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Menu rekapitulasi hanya tersedia untuk admin.');
-        }
-
         $data = $request->validate([
             'tgl_awal' => ['required', 'date'],
             'tgl_akhir' => ['required', 'date', 'after_or_equal:tgl_awal'],

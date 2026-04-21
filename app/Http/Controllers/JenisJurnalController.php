@@ -13,12 +13,6 @@ class JenisJurnalController extends Controller
 {
     public function index(Request $request): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Jenis transaksi hanya dapat dikelola oleh admin.');
-        }
-
         return view('jurnal-kas.jenis.index', [
             'types' => JenisJurnal::query()->orderBy('idjenis')->get(),
         ]);
@@ -26,12 +20,6 @@ class JenisJurnalController extends Controller
 
     public function create(Request $request): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Jenis transaksi hanya dapat dikelola oleh admin.');
-        }
-
         return view('jurnal-kas.jenis.create', [
             'type' => new JenisJurnal(),
         ]);
@@ -39,12 +27,6 @@ class JenisJurnalController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Jenis transaksi hanya dapat dikelola oleh admin.');
-        }
-
         $operator = $this->resolveCurrentOperator($request);
         $data = $this->validatedData($request);
 
@@ -61,12 +43,6 @@ class JenisJurnalController extends Controller
 
     public function edit(Request $request, JenisJurnal $type): View|RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Jenis transaksi hanya dapat dikelola oleh admin.');
-        }
-
         return view('jurnal-kas.jenis.edit', [
             'type' => $type,
         ]);
@@ -74,12 +50,6 @@ class JenisJurnalController extends Controller
 
     public function update(Request $request, JenisJurnal $type): RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Jenis transaksi hanya dapat dikelola oleh admin.');
-        }
-
         $operator = $this->resolveCurrentOperator($request);
         $type->update([
             ...$this->validatedData($request, $type),
@@ -93,12 +63,6 @@ class JenisJurnalController extends Controller
 
     public function destroy(Request $request, JenisJurnal $type): RedirectResponse
     {
-        if ($request->user()?->role !== 'admin') {
-            return redirect()
-                ->route('jurnal-kas.index')
-                ->with('error', 'Jenis transaksi hanya dapat dikelola oleh admin.');
-        }
-
         if ($type->jurnal()->exists()) {
             return redirect()
                 ->route('jurnal-kas.types.index')

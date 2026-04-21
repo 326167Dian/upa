@@ -78,12 +78,16 @@
                                     <td class="text-end">{{ $rupiah($entry->debit) }}</td>
                                     <td class="text-end">{{ $rupiah($entry->kredit) }}</td>
                                     <td class="text-end">
-                                        <a href="{{ route('jurnal-kas.edit', $entry) }}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                        <form method="POST" action="{{ route('jurnal-kas.destroy', $entry) }}" class="d-inline-block" onsubmit="return confirm('Hapus jurnal ini?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
-                                        </form>
+                                        @if (auth()->user()?->hasFeatureAccess('jurnal_kas.edit'))
+                                            <a href="{{ route('jurnal-kas.edit', $entry) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        @endif
+                                        @if (auth()->user()?->hasFeatureAccess('jurnal_kas.delete'))
+                                            <form method="POST" action="{{ route('jurnal-kas.destroy', $entry) }}" class="d-inline-block" onsubmit="return confirm('Hapus jurnal ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                            </form>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
