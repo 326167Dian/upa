@@ -53,6 +53,11 @@ class Operator extends Model
         return $this->hasMany(Pengumuman::class, 'id_operator', 'id');
     }
 
+    public function fotoKegiatan(): HasMany
+    {
+        return $this->hasMany(FotoKegiatan::class, 'created_by', 'id');
+    }
+
     public static function featureDefinitions(): array
     {
         return FeaturePermission::definitions();

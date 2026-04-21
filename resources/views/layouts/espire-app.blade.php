@@ -269,6 +269,14 @@
                             </a>
                         </li>
                     @endif
+                    @if (auth()->user()->hasFeatureAccess('foto_kegiatan.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('foto-kegiatan.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('foto-kegiatan.index') }}">
+                                <i class="feather icon-image"></i>
+                                <span class="nav-menu-item-title">Foto Kegiatan</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
 

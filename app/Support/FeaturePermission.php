@@ -67,6 +67,16 @@ class FeaturePermission
                     'delete' => 'Hapus',
                 ],
             ],
+            'foto_kegiatan' => [
+                'label' => 'Foto Kegiatan',
+                'route' => 'foto-kegiatan.index',
+                'actions' => [
+                    'view' => 'Lihat',
+                    'create' => 'Tambah',
+                    'edit' => 'Edit',
+                    'delete' => 'Hapus',
+                ],
+            ],
         ];
     }
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FotoKegiatanController;
 use App\Http\Controllers\JenisJurnalController;
 use App\Http\Controllers\JurnalKasController;
 use App\Http\Controllers\KegiatanController;
@@ -57,6 +58,13 @@ Route::middleware('auth')->group(function () {
     Route::match(['put', 'patch'], '/pengumuman/{pengumuman}', [PengumumanController::class, 'update'])->middleware('feature:pengumuman.edit')->name('pengumuman.update');
     Route::delete('/pengumuman/{pengumuman}', [PengumumanController::class, 'destroy'])->middleware('feature:pengumuman.delete')->name('pengumuman.destroy');
     Route::post('/pengumuman/upload-image', [PengumumanController::class, 'uploadImage'])->name('pengumuman.upload-image');
+
+    Route::get('/foto-kegiatan', [FotoKegiatanController::class, 'index'])->middleware('feature:foto_kegiatan.view')->name('foto-kegiatan.index');
+    Route::get('/foto-kegiatan/create', [FotoKegiatanController::class, 'create'])->middleware('feature:foto_kegiatan.create')->name('foto-kegiatan.create');
+    Route::post('/foto-kegiatan', [FotoKegiatanController::class, 'store'])->middleware('feature:foto_kegiatan.create')->name('foto-kegiatan.store');
+    Route::get('/foto-kegiatan/{fotoKegiatan}/edit', [FotoKegiatanController::class, 'edit'])->middleware('feature:foto_kegiatan.edit')->name('foto-kegiatan.edit');
+    Route::match(['put', 'patch'], '/foto-kegiatan/{fotoKegiatan}', [FotoKegiatanController::class, 'update'])->middleware('feature:foto_kegiatan.edit')->name('foto-kegiatan.update');
+    Route::delete('/foto-kegiatan/{fotoKegiatan}', [FotoKegiatanController::class, 'destroy'])->middleware('feature:foto_kegiatan.delete')->name('foto-kegiatan.destroy');
 
     Route::prefix('jurnal-kas')->name('jurnal-kas.')->group(function () {
         Route::get('/', [JurnalKasController::class, 'index'])->middleware('feature:jurnal_kas.view')->name('index');
