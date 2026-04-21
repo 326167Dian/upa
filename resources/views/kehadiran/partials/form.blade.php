@@ -1,13 +1,24 @@
 <div class="mb-3">
     <label for="id" class="form-label">Operator</label>
-    <select id="id" name="id" class="form-select @error('id') is-invalid @enderror">
-        <option value="">Pilih operator</option>
-        @foreach ($operators as $operator)
-            <option value="{{ $operator->id }}" @selected((string) old('id', $kehadiran->id) === (string) $operator->id)>
-                {{ $operator->name }}
-            </option>
-        @endforeach
-    </select>
+    @if (! empty($lockOperatorSelection) && $currentOperator)
+        <input type="hidden" name="id" value="{{ $currentOperator->id }}">
+        <input
+            id="id"
+            type="text"
+            class="form-control @error('id') is-invalid @enderror"
+            value="{{ $currentOperator->name }}"
+            readonly
+        >
+    @else
+        <select id="id" name="id" class="form-select @error('id') is-invalid @enderror">
+            <option value="">Pilih operator</option>
+            @foreach ($operators as $operator)
+                <option value="{{ $operator->id }}" @selected((string) old('id', $kehadiran->id) === (string) $operator->id)>
+                    {{ $operator->name }}
+                </option>
+            @endforeach
+        </select>
+    @endif
     @error('id')
         <div class="invalid-feedback">{{ $message }}</div>
     @enderror

@@ -96,6 +96,30 @@ class FeaturePermission
         return $keys;
     }
 
+    /**
+     * @return list<string>
+     */
+    public static function defaultUserPermissions(): array
+    {
+        $permissions = [];
+
+        foreach (self::definitions() as $module => $definition) {
+            if ($module === 'operators') {
+                continue;
+            }
+
+            foreach (array_keys($definition['actions']) as $action) {
+                if ($module === 'jurnal_kas' && $action !== 'view') {
+                    continue;
+                }
+
+                $permissions[] = self::permissionKey($module, $action);
+            }
+        }
+
+        return $permissions;
+    }
+
     public static function permissionKey(string $module, string $action): string
     {
         return $module.'.'.$action;

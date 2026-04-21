@@ -68,6 +68,11 @@
                                     <button type="submit" class="btn btn-primary w-100">Log In</button>
                                 </form>
 
+                                <div class="text-center mt-3">
+                                    <span class="text-muted">Belum punya akun?</span>
+                                    <a href="{{ route('register') }}" class="fw-semibold">Registrasi</a>
+                                </div>
+
                                 {{-- <div class="divider">
                                     <span class="divider-text text-muted">akun awal</span>
                                 </div> --}}

@@ -74,7 +74,11 @@ class User extends Authenticatable
         }
 
         if ($this->role === self::ROLE_USER) {
-            return true;
+            if ($this->permissions === null) {
+                return true;
+            }
+
+            return FeaturePermission::grants($this->permissions, $permission);
         }
 
         return FeaturePermission::grants($this->permissions, $permission);

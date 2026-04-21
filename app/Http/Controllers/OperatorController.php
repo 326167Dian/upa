@@ -203,7 +203,11 @@ class OperatorController extends Controller
         }
 
         if ($role === User::ROLE_USER) {
-            return FeaturePermission::keys();
+            if ($permissions === []) {
+                return FeaturePermission::keys();
+            }
+
+            return array_values(array_intersect(FeaturePermission::keys(), $permissions));
         }
 
         return array_values(array_intersect(FeaturePermission::keys(), $permissions));
