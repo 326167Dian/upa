@@ -19,6 +19,7 @@ class Operator extends Model
         'permissions',
         'phone_number',
         'full_address',
+        'avatar_path',
     ];
 
     protected $hidden = [

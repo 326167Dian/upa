@@ -8,6 +8,7 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\KehadiranController;
 use App\Http\Controllers\OperatorController;
 use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,8 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->middleware('feature:dashboard.view')->name('dashboard');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
     Route::get('/operators', [OperatorController::class, 'index'])->middleware('feature:operators.view')->name('operators.index');
     Route::get('/operators/create', [OperatorController::class, 'create'])->middleware('feature:operators.create')->name('operators.create');

@@ -10,6 +10,8 @@
     @php
         $espireBase = 'Espire/espireadmin-10/Espire - Bootstrap Admin Template/html/demo/app';
         $espireAsset = fn (string $path) => url(str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path)));
+        $profileOperator = auth()->user()?->operator;
+        $profileAvatar = $profileOperator?->avatar_path ? asset('storage/'.$profileOperator->avatar_path) : asset('images/cakep.png');
     @endphp
 
     <link rel="shortcut icon" href="{{ $espireAsset('images/logo/favicon.ico') }}">
@@ -169,7 +171,7 @@
                             <div class="dropdown header-nav-item-select nav-profile">
                                 <div class="toggle-wrapper" id="nav-profile-dropdown" data-bs-toggle="dropdown">
                                     <div class="avatar avatar-circle avatar-image" style="width: 35px; height: 35px; line-height: 35px;">
-                                        <img src="{{ asset('images/cakep.png') }}" alt="avatar">
+                                        <img src="{{ $profileAvatar }}" alt="avatar">
                                     </div>
                                     <span class="fw-bold mx-1">{{ auth()->user()->username }}</span>
                                     <i class="feather icon-chevron-down"></i>
@@ -178,7 +180,7 @@
                                     <div class="nav-profile-header">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar avatar-circle avatar-image">
-                                                <img src="{{ asset('images/cakep.png') }}" alt="avatar">
+                                                <img src="{{ $profileAvatar }}" alt="avatar">
                                             </div>
                                             <div class="d-flex flex-column ms-1">
                                                 <span class="fw-bold text-dark">{{ auth()->user()->name }}</span>
@@ -187,6 +189,12 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <a href="{{ route('profile.edit') }}" class="dropdown-item">
+                                        <div class="d-flex align-items-center">
+                                            <i class="font-size-lg me-2 feather icon-user"></i>
+                                            <span>Edit Profile</span>
+                                        </div>
+                                    </a>
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit" class="dropdown-item border-0 bg-transparent w-100 text-start">
