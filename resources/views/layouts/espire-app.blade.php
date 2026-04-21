@@ -167,7 +167,7 @@
                             <div class="dropdown header-nav-item-select nav-profile">
                                 <div class="toggle-wrapper" id="nav-profile-dropdown" data-bs-toggle="dropdown">
                                     <div class="avatar avatar-circle avatar-image" style="width: 35px; height: 35px; line-height: 35px;">
-                                        <img src="{{ $espireAsset('images/avatars/thumb-1.jpg') }}" alt="avatar">
+                                        <img src="{{ asset('images/cakep.png') }}" alt="avatar">
                                     </div>
                                     <span class="fw-bold mx-1">{{ auth()->user()->username }}</span>
                                     <i class="feather icon-chevron-down"></i>
@@ -176,7 +176,7 @@
                                     <div class="nav-profile-header">
                                         <div class="d-flex align-items-center">
                                             <div class="avatar avatar-circle avatar-image">
-                                                <img src="{{ $espireAsset('images/avatars/thumb-1.jpg') }}" alt="avatar">
+                                                <img src="{{ asset('images/cakep.png') }}" alt="avatar">
                                             </div>
                                             <div class="d-flex flex-column ms-1">
                                                 <span class="fw-bold text-dark">{{ auth()->user()->name }}</span>
