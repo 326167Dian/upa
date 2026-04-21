@@ -310,7 +310,9 @@
 
     <script src="{{ $espireAsset('js/vendors.min.js') }}"></script>
     <script src="{{ $espireAsset('js/app.min.js') }}"></script>
-    @vite(['resources/js/app.js'])
+    @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
+        @vite(['resources/js/app.js'])
+    @endif
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const sidebar = document.getElementById('app-sidebar');

@@ -21,6 +21,28 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
+## Hostinger Deployment Notes
+
+For shared hosting layouts where the application lives outside the web root and public files are served from `public_html`, use these settings in `.env`:
+
+```env
+APP_ENV=production
+APP_DEBUG=false
+DIRECT_PUBLIC_UPLOADS=true
+PUBLIC_DISK_URL="${APP_URL}/storage"
+```
+
+With `DIRECT_PUBLIC_UPLOADS=true`, files uploaded to the `public` disk are written directly to `public_html/storage`, so the app does not depend on `php artisan storage:link`.
+
+After pulling the latest changes on the server:
+
+```bash
+php artisan optimize:clear
+php artisan migrate --force
+```
+
+Build frontend assets locally with `npm.cmd install` and `npm.cmd run build`, then upload the generated `public/build` directory to the hosting public directory if your deployment target does not run Node.js.
+
 ## Learning Laravel
 
 Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
