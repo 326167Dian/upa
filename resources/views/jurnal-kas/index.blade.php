@@ -10,7 +10,7 @@
             <div class="d-md-flex align-items-center justify-content-between w-100">
                 <div>
                     <h2 class="font-weight-normal mb-1">Jurnal Kas</h2>
-                    <p class="text-muted mb-0">Catatan kas harian tanggal {{ $today->format('d-m-Y') }}</p>
+                    <p class="text-muted mb-0">Catatan kas tahun {{ $currentYear }}</p>
                 </div>
                 <div class="text-md-end mt-3 mt-md-0">
                     <div class="font-size-sm text-muted">Saldo Saat Ini</div>
@@ -43,7 +43,7 @@
             <div class="col-md-4 mb-3">
                 <div class="card h-100">
                     <div class="card-body">
-                        <div class="text-muted">Saldo Hari Ini</div>
+                        <div class="text-muted">Saldo Tahun Ini</div>
                         <h3 class="mb-2">{{ $rupiah($summary['saldo']) }}</h3>
                         <div class="small text-muted">Tunai {{ $rupiah($summary['saldo_tunai']) }} | Transfer {{ $rupiah($summary['saldo_transfer']) }}</div>
                     </div>

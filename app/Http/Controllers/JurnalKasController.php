@@ -18,10 +18,10 @@ class JurnalKasController extends Controller
 {
     public function index(): View
     {
-        $today = Carbon::today();
+        $currentYear = Carbon::now()->year;
         $entries = Jurnal::query()
             ->with('jenisJurnal')
-            ->whereDate('tanggal', $today)
+            ->whereYear('tanggal', $currentYear)
             ->latest('id_jurnal')
             ->get();
 
@@ -29,7 +29,7 @@ class JurnalKasController extends Controller
             'entries' => $entries,
             'summary' => $this->buildSummary($entries),
             'currentBalance' => $this->currentKasBalance(),
-            'today' => $today,
+            'currentYear' => $currentYear,
         ]);
     }
 
