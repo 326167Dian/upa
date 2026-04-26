@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\Kegiatan;
 use App\Models\Kehadiran;
 use App\Models\Operator;
+use App\Support\SimpleXlsxWriter;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class KehadiranController extends Controller
 {
@@ -40,6 +44,77 @@ class KehadiranController extends Controller
             'kehadiran' => $query->latest('id_kehadiran')->get(),
             'availableDates' => $availableDates,
             'selectedDate' => $selectedDate,
+        ]);
+    }
+
+    public function export(Request $request): BinaryFileResponse|StreamedResponse
+    {
+        $selectedDate = (string) $request->query('waktu', '');
+
+        $suffix = $selectedDate ?: 'semua';
+        $filename = 'kehadiran-'.$suffix.'.xlsx';
+        $rows = $this->buildExportRows($selectedDate);
+
+        try {
+            $xlsxPath = SimpleXlsxWriter::create(
+                ['Operator', 'Kegiatan', 'Waktu', 'Status', 'Keterangan'],
+                $rows
+            );
+
+            return response()->download($xlsxPath, $filename)->deleteFileAfterSend(true);
+        } catch (Throwable) {
+            return $this->fallbackCsvExport($rows, $suffix);
+        }
+    }
+
+    /**
+     * @return array<int, array<int, string>>
+     */
+    protected function buildExportRows(string $selectedDate): array
+    {
+        $query = Kehadiran::with(['operator', 'kegiatan'])->latest('id_kehadiran');
+
+        if ($selectedDate !== '') {
+            $query->whereRaw('DATE(waktu) = ?', [$selectedDate]);
+        }
+
+        return $query->get()->map(function (Kehadiran $item): array {
+            return [
+                $item->operator?->name ?? '-',
+                $item->kegiatan?->nama_kegiatan ?? '-',
+                $item->waktu?->format('Y-m-d H:i:s') ?? '-',
+                $item->hadir === 1 ? 'Hadir' : 'Tidak Hadir',
+                $item->keterangan ?: '-',
+            ];
+        })->all();
+    }
+
+    /**
+     * @param array<int, array<int, string>> $rows
+     */
+    protected function fallbackCsvExport(array $rows, string $suffix): StreamedResponse
+    {
+        $filename = 'kehadiran-'.$suffix.'.csv';
+
+        return response()->streamDownload(function () use ($rows): void {
+            $handle = fopen('php://output', 'w');
+
+            if ($handle === false) {
+                return;
+            }
+
+            // UTF-8 BOM so Excel reads Indonesian characters correctly.
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, ['Operator', 'Kegiatan', 'Waktu', 'Status', 'Keterangan']);
+
+            foreach ($rows as $row) {
+                fputcsv($handle, $row);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 

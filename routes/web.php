@@ -47,6 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/kegiatan/{kegiatan}', [KegiatanController::class, 'destroy'])->middleware('feature:kegiatan.delete')->name('kegiatan.destroy');
 
     Route::get('/kehadiran', [KehadiranController::class, 'index'])->middleware('feature:kehadiran.view')->name('kehadiran.index');
+    Route::get('/kehadiran/export', [KehadiranController::class, 'export'])->middleware('feature:kehadiran.view')->name('kehadiran.export');
     Route::get('/kehadiran/create', [KehadiranController::class, 'create'])->middleware('feature:kehadiran.create')->name('kehadiran.create');
     Route::post('/kehadiran', [KehadiranController::class, 'store'])->middleware('feature:kehadiran.create')->name('kehadiran.store');
     Route::get('/kehadiran/{kehadiran}/edit', [KehadiranController::class, 'edit'])->middleware('feature:kehadiran.edit')->name('kehadiran.edit');

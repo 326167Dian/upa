@@ -28,6 +28,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary">Filter</button>
+                    <a href="{{ route('kehadiran.export', ['waktu' => $selectedDate ?: null]) }}" class="btn btn-success">Export Excel</a>
                     @if ($selectedDate)
                         <a href="{{ route('kehadiran.index') }}" class="btn btn-secondary">Reset</a>
                     @endif
