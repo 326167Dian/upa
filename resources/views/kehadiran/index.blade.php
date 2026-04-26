@@ -11,6 +11,30 @@
             </div>
         </div>
 
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="GET" action="{{ route('kehadiran.index') }}" class="d-flex flex-wrap align-items-end gap-2">
+                    <div class="grow" style="min-width: 250px;">
+                        <label for="waktu" class="form-label mb-2">Filter Berdasarkan Tanggal</label>
+                        <select id="waktu" name="waktu" class="form-select">
+                            <option value="">-- Tampilkan Semua --</option>
+                            @forelse ($availableDates as $date)
+                                <option value="{{ $date['value'] }}" @selected($selectedDate === $date['value'])>
+                                    {{ $date['label'] }}
+                                </option>
+                            @empty
+                                <option value="" disabled>Tidak ada data tanggal</option>
+                            @endforelse
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                    @if ($selectedDate)
+                        <a href="{{ route('kehadiran.index') }}" class="btn btn-secondary">Reset</a>
+                    @endif
+                </form>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
@@ -30,7 +54,15 @@
                                 <tr>
                                     <td>{{ $item->operator?->name ?? '-' }}</td>
                                     <td>{{ $item->kegiatan?->nama_kegiatan ?? '-' }}</td>
-                                    <td>{{ optional($item->waktu)->format('d M Y H:i') ?? '-' }}</td>
+                                    <td>
+                                        @if ($item->waktu)
+                                            <span title="{{ $item->waktu->format('d M Y H:i') }}">
+                                                {{ $item->waktu->format('d M Y') }}
+                                            </span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                     <td>
                                         <span class="badge {{ $item->hadir === 1 ? 'bg-success' : 'bg-danger' }}">
                                             {{ $item->hadir === 1 ? 'Hadir' : 'Tidak Hadir' }}
@@ -71,7 +103,13 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">Belum ada data kehadiran.</td>
+                                    <td colspan="6" class="text-center text-muted">
+                                        @if ($selectedDate)
+                                            Tidak ada data kehadiran pada tanggal {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}.
+                                        @else
+                                            Belum ada data kehadiran.
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforelse
                         </tbody>

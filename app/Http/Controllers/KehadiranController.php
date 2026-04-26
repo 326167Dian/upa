@@ -8,17 +8,38 @@ use App\Models\Operator;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class KehadiranController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $selectedDate = $request->query('waktu', '');
+        
+        $availableDates = Kehadiran::query()
+            ->whereNotNull('waktu')
+            ->selectRaw('DATE(waktu) as tanggal')
+            ->distinct()
+            ->orderByDesc('tanggal')
+            ->pluck('tanggal')
+            ->map(fn (string $date) => [
+                'value' => $date,
+                'label' => Carbon::parse($date)->format('d M Y'),
+            ])
+            ->values();
+        
+        $query = Kehadiran::with(['operator', 'kegiatan']);
+        
+        if ($selectedDate) {
+            $query->whereRaw('DATE(waktu) = ?', [$selectedDate]);
+        }
+        
         return view('kehadiran.index', [
-            'kehadiran' => Kehadiran::with(['operator', 'kegiatan'])
-                ->latest('id_kehadiran')
-                ->get(),
+            'kehadiran' => $query->latest('id_kehadiran')->get(),
+            'availableDates' => $availableDates,
+            'selectedDate' => $selectedDate,
         ]);
     }
 

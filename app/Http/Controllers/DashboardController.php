@@ -19,38 +19,45 @@ class DashboardController extends Controller
             ->selectRaw("DATE_FORMAT(waktu, '%Y-%m') as period")
             ->distinct()
             ->orderByDesc('period')
-            ->pluck('period');
+            ->pluck('period')
+            ->toArray();
 
         $selectedPeriod = (string) $request->query('period', '');
 
-        if (! $periodOptions->contains($selectedPeriod)) {
-            $selectedPeriod = $periodOptions->first() ?? now()->format('Y-m');
+        if (! in_array($selectedPeriod, $periodOptions, true)) {
+            $selectedPeriod = $periodOptions[0] ?? now()->format('Y-m');
         }
 
-        $attendanceTrend = Kehadiran::query()
-            ->whereNotNull('waktu')
-            ->whereRaw("DATE_FORMAT(waktu, '%Y-%m') = ?", [$selectedPeriod])
-            ->selectRaw('DATE(waktu) as tanggal, SUM(hadir) as total_hadir')
-            ->groupBy('tanggal')
-            ->orderBy('tanggal')
-            ->get();
+        $attendanceTrend = collect();
+        if ($selectedPeriod && in_array($selectedPeriod, $periodOptions, true)) {
+            $attendanceTrend = Kehadiran::query()
+                ->whereNotNull('waktu')
+                ->whereRaw("DATE_FORMAT(waktu, '%Y-%m') = ?", [$selectedPeriod])
+                ->selectRaw('DATE(waktu) as tanggal, SUM(hadir) as total_hadir')
+                ->groupBy('tanggal')
+                ->orderBy('tanggal')
+                ->get();
+        }
 
-        $attendancePeriodOptions = $periodOptions
+        $attendancePeriodOptions = collect($periodOptions)
             ->map(fn (string $period) => [
                 'value' => $period,
                 'label' => Carbon::createFromFormat('Y-m', $period)->format('F Y'),
             ])
-            ->values();
+            ->values()
+            ->toArray();
 
         $attendanceChartLabels = $attendanceTrend
             ->pluck('tanggal')
             ->map(fn (string $date) => Carbon::parse($date)->format('d-m-Y'))
-            ->values();
+            ->values()
+            ->toArray();
 
         $attendanceChartValues = $attendanceTrend
             ->pluck('total_hadir')
             ->map(fn ($value) => (int) $value)
-            ->values();
+            ->values()
+            ->toArray();
 
         return view('dashboard.index', [
             'operatorCount' => Operator::count(),

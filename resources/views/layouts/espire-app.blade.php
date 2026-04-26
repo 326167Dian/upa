@@ -309,6 +309,7 @@
     </div>
 
     <script src="{{ $espireAsset('js/vendors.min.js') }}"></script>
+    <script src="{{ $espireAsset('vendors/apexcharts/dist/apexcharts.min.js') }}"></script>
     <script src="{{ $espireAsset('js/app.min.js') }}"></script>
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
         @vite(['resources/js/app.js'])
