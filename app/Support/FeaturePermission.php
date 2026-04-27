@@ -77,6 +77,16 @@ class FeaturePermission
                     'delete' => 'Hapus',
                 ],
             ],
+            'catatan' => [
+                'label' => 'Catatan Harian',
+                'route' => 'catatan.index',
+                'actions' => [
+                    'view' => 'Lihat',
+                    'create' => 'Tambah',
+                    'edit' => 'Edit',
+                    'delete' => 'Hapus',
+                ],
+            ],
         ];
     }
 

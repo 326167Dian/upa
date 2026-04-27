@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CatatanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FotoKegiatanController;
 use App\Http\Controllers\JenisJurnalController;
@@ -95,5 +96,14 @@ Route::middleware('auth')->group(function () {
             Route::delete('/{type}', [JenisJurnalController::class, 'destroy'])->middleware('feature:jurnal_kas.delete')->name('destroy');
         });
     });
+    Route::get('/catatan', [CatatanController::class, 'index'])->middleware('feature:catatan.view')->name('catatan.index');
+    Route::get('/catatan/create', [CatatanController::class, 'create'])->middleware('feature:catatan.create')->name('catatan.create');
+    Route::post('/catatan', [CatatanController::class, 'store'])->middleware('feature:catatan.create')->name('catatan.store');
+    Route::get('/catatan/{catatan}', [CatatanController::class, 'show'])->middleware('feature:catatan.view')->name('catatan.show');
+    Route::get('/catatan/{catatan}/download/{index}', [CatatanController::class, 'download'])->middleware('feature:catatan.view')->whereNumber('index')->name('catatan.download');
+    Route::get('/catatan/{catatan}/edit', [CatatanController::class, 'edit'])->middleware('feature:catatan.edit')->name('catatan.edit');
+    Route::match(['put', 'patch'], '/catatan/{catatan}', [CatatanController::class, 'update'])->middleware('feature:catatan.edit')->name('catatan.update');
+    Route::delete('/catatan/{catatan}', [CatatanController::class, 'destroy'])->middleware('feature:catatan.delete')->name('catatan.destroy');
+
     Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 });

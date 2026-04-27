@@ -19,6 +19,7 @@ class Operator extends Model
         'permissions',
         'phone_number',
         'full_address',
+        'mulai_upa_tahun',
         'avatar_path',
     ];
 

@@ -277,6 +277,14 @@
                             </a>
                         </li>
                     @endif
+                    @if (auth()->user()->hasFeatureAccess('catatan.view'))
+                        <li class="nav-menu-item {{ request()->routeIs('catatan.*') ? 'router-link-active' : '' }}">
+                            <a href="{{ route('catatan.index') }}">
+                                <i class="feather icon-book-open"></i>
+                                <span class="nav-menu-item-title">Catatan Harian</span>
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
 

@@ -27,6 +27,7 @@ class ProfileController extends Controller
             'avatar' => ['nullable', 'image', 'max:2048'],
             'phone_number' => ['required', 'string', 'max:30'],
             'full_address' => ['required', 'string'],
+            'mulai_upa_tahun' => ['nullable', 'string', 'max:100'],
             'current_password' => ['nullable', 'required_with:password', 'current_password'],
             'password' => ['nullable', 'string', 'min:8', 'confirmed'],
         ]);
@@ -41,6 +42,7 @@ class ProfileController extends Controller
 
         $operator->phone_number = $data['phone_number'];
         $operator->full_address = $data['full_address'];
+        $operator->mulai_upa_tahun = $data['mulai_upa_tahun'] ?? null;
 
         if (filled($data['password'] ?? null)) {
             $passwordHash = Hash::make($data['password']);
@@ -70,6 +72,7 @@ class ProfileController extends Controller
             'permissions' => $user->permissions,
             'phone_number' => '-',
             'full_address' => 'Belum diisi',
+            'mulai_upa_tahun' => null,
         ]);
     }
 }

@@ -48,8 +48,24 @@
 
                             <div class="mb-3">
                                 <label for="full_address" class="form-label">Alamat Lengkap</label>
-                                <textarea id="full_address" name="full_address" rows="4" class="form-control @error('full_address') is-invalid @enderror">{{ old('full_address', $operator->full_address) }}</textarea>
+                                <textarea id="full_address" name="full_address" rows="5" data-rich-text="ckeditor" class="form-control @error('full_address') is-invalid @enderror">{{ old('full_address', $operator->full_address) }}</textarea>
                                 @error('full_address')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="mulai_upa_tahun" class="form-label">Mulai UPA Tahun</label>
+                                <input
+                                    id="mulai_upa_tahun"
+                                    name="mulai_upa_tahun"
+                                    type="text"
+                                    maxlength="100"
+                                    class="form-control @error('mulai_upa_tahun') is-invalid @enderror"
+                                    value="{{ old('mulai_upa_tahun', $operator->mulai_upa_tahun) }}"
+                                    placeholder="Contoh: 2020"
+                                >
+                                @error('mulai_upa_tahun')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
