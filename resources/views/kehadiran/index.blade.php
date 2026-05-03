@@ -27,9 +27,17 @@
                             @endforelse
                         </select>
                     </div>
+                    <div style="min-width: 200px;">
+                        <label for="status" class="form-label mb-2">Status Kehadiran</label>
+                        <select id="status" name="status" class="form-select">
+                            <option value="">-- Tampilkan Semua --</option>
+                            <option value="1" @selected($selectedStatus === '1')>Hadir</option>
+                            <option value="0" @selected($selectedStatus === '0')>Tidak Hadir</option>
+                        </select>
+                    </div>
                     <button type="submit" class="btn btn-primary">Filter</button>
-                    <a href="{{ route('kehadiran.export', ['waktu' => $selectedDate ?: null]) }}" class="btn btn-success">Export Excel</a>
-                    @if ($selectedDate)
+                    <a href="{{ route('kehadiran.export', array_filter(['waktu' => $selectedDate ?: null, 'status' => $selectedStatus !== '' ? $selectedStatus : null])) }}" class="btn btn-success">Export Excel</a>
+                    @if ($selectedDate || $selectedStatus !== '')
                         <a href="{{ route('kehadiran.index') }}" class="btn btn-secondary">Reset</a>
                     @endif
                 </form>

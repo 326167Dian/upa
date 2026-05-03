@@ -59,6 +59,31 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
+        // Absensi (tidak hadir) table
+        $absensiDates = Kehadiran::query()
+            ->where('hadir', 0)
+            ->whereNotNull('waktu')
+            ->selectRaw('DATE(waktu) as tanggal')
+            ->distinct()
+            ->orderByDesc('tanggal')
+            ->pluck('tanggal')
+            ->toArray();
+
+        $selectedAbsensiDate = (string) $request->query('absensi_date', '');
+
+        if (! in_array($selectedAbsensiDate, $absensiDates, true)) {
+            $selectedAbsensiDate = $absensiDates[0] ?? '';
+        }
+
+        $absensiList = collect();
+        if ($selectedAbsensiDate !== '') {
+            $absensiList = Kehadiran::with('operator')
+                ->where('hadir', 0)
+                ->whereRaw('DATE(waktu) = ?', [$selectedAbsensiDate])
+                ->orderBy('id_kehadiran')
+                ->get();
+        }
+
         return view('dashboard.index', [
             'operatorCount' => Operator::count(),
             'adminCount' => Operator::where('role', 'admin')->count(),
@@ -73,6 +98,9 @@ class DashboardController extends Controller
             'selectedAttendancePeriod' => $selectedPeriod,
             'attendanceChartLabels' => $attendanceChartLabels,
             'attendanceChartValues' => $attendanceChartValues,
+            'absensiDates' => $absensiDates,
+            'selectedAbsensiDate' => $selectedAbsensiDate,
+            'absensiList' => $absensiList,
         ]);
     }
 }

@@ -21,6 +21,7 @@ class KehadiranController extends Controller
     public function index(Request $request): View
     {
         $selectedDate = $request->query('waktu', '');
+        $selectedStatus = $request->query('status', '');
         
         $availableDates = Kehadiran::query()
             ->whereNotNull('waktu')
@@ -39,21 +40,28 @@ class KehadiranController extends Controller
         if ($selectedDate) {
             $query->whereRaw('DATE(waktu) = ?', [$selectedDate]);
         }
+
+        if ($selectedStatus !== '') {
+            $query->where('hadir', (int) $selectedStatus);
+        }
         
         return view('kehadiran.index', [
             'kehadiran' => $query->latest('id_kehadiran')->get(),
             'availableDates' => $availableDates,
             'selectedDate' => $selectedDate,
+            'selectedStatus' => $selectedStatus,
         ]);
     }
 
     public function export(Request $request): BinaryFileResponse|StreamedResponse
     {
         $selectedDate = (string) $request->query('waktu', '');
+        $selectedStatus = (string) $request->query('status', '');
 
-        $suffix = $selectedDate ?: 'semua';
+        $parts = array_filter([$selectedDate ?: null, $selectedStatus !== '' ? ($selectedStatus === '1' ? 'hadir' : 'tidak-hadir') : null]);
+        $suffix = $parts ? implode('-', $parts) : 'semua';
         $filename = 'kehadiran-'.$suffix.'.xlsx';
-        $rows = $this->buildExportRows($selectedDate);
+        $rows = $this->buildExportRows($selectedDate, $selectedStatus);
 
         try {
             $xlsxPath = SimpleXlsxWriter::create(
@@ -70,12 +78,16 @@ class KehadiranController extends Controller
     /**
      * @return array<int, array<int, string>>
      */
-    protected function buildExportRows(string $selectedDate): array
+    protected function buildExportRows(string $selectedDate, string $selectedStatus = ''): array
     {
         $query = Kehadiran::with(['operator', 'kegiatan'])->latest('id_kehadiran');
 
         if ($selectedDate !== '') {
             $query->whereRaw('DATE(waktu) = ?', [$selectedDate]);
+        }
+
+        if ($selectedStatus !== '') {
+            $query->where('hadir', (int) $selectedStatus);
         }
 
         return $query->get()->map(function (Kehadiran $item): array {

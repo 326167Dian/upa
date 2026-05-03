@@ -59,6 +59,65 @@
                 </div>
             </div>
         </div>
+
+        {{-- Absensi UPA --}}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+
+                        {{-- Filter Tanggal --}}
+                        @if (count($absensiDates) > 0)
+                            <form method="GET" action="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 mb-3">
+                                @if ($selectedAttendancePeriod)
+                                    <input type="hidden" name="period" value="{{ $selectedAttendancePeriod }}">
+                                @endif
+                                <label for="absensi_date" class="mb-0 text-muted text-nowrap">Filter Tanggal</label>
+                                <select id="absensi_date" name="absensi_date" class="form-select form-select-sm" style="max-width: 220px;" onchange="this.form.submit()">
+                                    @foreach ($absensiDates as $date)
+                                        <option value="{{ $date }}" @selected($selectedAbsensiDate === $date)>
+                                            {{ \Illuminate\Support\Carbon::parse($date)->locale('id')->isoFormat('DD MMMM YYYY') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
+                        @endif
+
+                        {{-- Judul --}}
+                        <h5 class="font-weight-bold text-center mb-3">
+                            ABSENSI UPA PEKANAN TANGGAL
+                            {{ $selectedAbsensiDate ? \Illuminate\Support\Carbon::parse($selectedAbsensiDate)->locale('id')->isoFormat('DD MMMM YYYY') : '-' }}
+                        </h5>
+
+                        @if ($absensiList->isNotEmpty())
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">No.</th>
+                                        <th>Nama Peserta</th>
+                                        <th>Keterangan tidak Hadir</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($absensiList as $i => $item)
+                                        <tr>
+                                            <td class="text-center">{{ $i + 1 }}</td>
+                                            <td>{{ $item->operator?->name ?? '-' }}</td>
+                                            <td>{{ $item->keterangan ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @elseif (count($absensiDates) === 0)
+                            <p class="text-muted mb-0">Belum ada data absensi.</p>
+                        @else
+                            <p class="text-muted mb-0">Tidak ada peserta yang tidak hadir pada tanggal ini.</p>
+                        @endif
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     @if (count($attendanceChartLabels) > 0)
