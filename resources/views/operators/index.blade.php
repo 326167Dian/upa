@@ -5,9 +5,14 @@
         <div class="page-header no-gutters has-tab">
             <div class="d-md-flex align-items-center justify-content-between w-100">
                 <h2 class="font-weight-normal mb-3 mb-md-0">Data Operator</h2>
-                @if (auth()->user()->hasFeatureAccess('operators.create'))
-                    <a href="{{ route('operators.create') }}" class="btn btn-primary">Tambah Operator</a>
-                @endif
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary" id="btnExportPdf" title="Export data operator ke PDF">
+                        <i class="feather icon-download"></i> Export PDF
+                    </button>
+                    @if (auth()->user()->hasFeatureAccess('operators.create'))
+                        <a href="{{ route('operators.create') }}" class="btn btn-primary">Tambah Operator</a>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -122,4 +127,101 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('btnExportPdf').addEventListener('click', function() {
+            const btn = this;
+            const originalText = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="feather icon-loader"></i> Membuat PDF...';
+
+            fetch('{{ route("operators.exportPdf") }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        generatePDF(data.data, data.filename);
+                    } else {
+                        alert('Gagal membuat PDF');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat membuat PDF');
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                });
+        });
+
+        function generatePDF(operators, filename) {
+            // Create PDF content using simple HTML
+            let html = `
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Data Operator</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #000; padding-bottom: 15px; }
+                        .header h1 { margin: 0; font-size: 24px; font-weight: bold; }
+                        .header p { margin: 5px 0 0 0; font-size: 12px; color: #666; }
+                        .operator-item { margin-bottom: 20px; padding: 15px; border: 1px solid #ddd; page-break-inside: avoid; }
+                        .operator-item .name { font-weight: bold; font-size: 14px; margin-bottom: 8px; }
+                        .info-row { margin-bottom: 6px; }
+                        .label { font-weight: bold; display: inline-block; width: 120px; }
+                        .value { display: inline-block; flex: 1; }
+                        .footer { margin-top: 40px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 11px; color: #999; text-align: center; }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>Data Operator UPA</h1>
+                        <p>Laporan Data Operator</p>
+                        <p>Tanggal: ${new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                    <div class="content">
+            `;
+
+            operators.forEach(operator => {
+                html += `
+                    <div class="operator-item">
+                        <div class="name">${operator.nama}</div>
+                        <div class="info-row">
+                            <span class="label">Telp/Wa</span>
+                            <span class="value">${operator.telp_wa}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Alamat</span>
+                            <span class="value">${operator.alamat}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="label">Mulai UPA</span>
+                            <span class="value">${operator.mulai_upa}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div class="footer">
+                        <p>Total Operator: ${operators.length} | Dicetak: ${new Date().toLocaleString('id-ID')}</p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            // Open in new window for printing to PDF
+            const printWindow = window.open('', '', 'width=800,height=600');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            
+            // Auto-trigger print dialog
+            setTimeout(() => {
+                printWindow.print();
+            }, 250);
+        }
+    </script>
 @endsection

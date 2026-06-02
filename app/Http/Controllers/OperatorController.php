@@ -212,4 +212,24 @@ class OperatorController extends Controller
 
         return array_values(array_intersect(FeaturePermission::keys(), $permissions));
     }
+
+    public function exportPdf(): \Illuminate\Http\JsonResponse
+    {
+        $operators = Operator::latest()->get();
+
+        $data = $operators->map(function (Operator $operator) {
+            return [
+                'nama' => $operator->name,
+                'telp_wa' => $operator->phone_number ?? '-',
+                'alamat' => trim(strip_tags($operator->full_address)) ?? '-',
+                'mulai_upa' => $operator->mulai_upa_tahun ?? '-',
+            ];
+        })->toArray();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'filename' => 'data-operator-' . date('Y-m-d-H-i-s') . '.pdf'
+        ]);
+    }
 }

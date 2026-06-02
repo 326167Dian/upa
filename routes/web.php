@@ -39,6 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/operators/{operator}/edit', [OperatorController::class, 'edit'])->middleware('feature:operators.edit')->name('operators.edit');
     Route::match(['put', 'patch'], '/operators/{operator}', [OperatorController::class, 'update'])->middleware('feature:operators.edit')->name('operators.update');
     Route::delete('/operators/{operator}', [OperatorController::class, 'destroy'])->middleware('feature:operators.delete')->name('operators.destroy');
+    Route::get('/operators/export/pdf', [OperatorController::class, 'exportPdf'])->middleware('feature:operators.view')->name('operators.exportPdf');
 
     Route::get('/kegiatan', [KegiatanController::class, 'index'])->middleware('feature:kegiatan.view')->name('kegiatan.index');
     Route::get('/kegiatan/create', [KegiatanController::class, 'create'])->middleware('feature:kegiatan.create')->name('kegiatan.create');
