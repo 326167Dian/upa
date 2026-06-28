@@ -281,58 +281,67 @@ class OperatorController extends Controller
             ];
         })->values();
 
-        if ($startDate !== '' || $endDate !== '') {
-            $groupedByDate = $attendanceRecords
+        $groupedByDate = $attendanceRecords
+            ->filter(fn (Kehadiran $item) => $item->waktu !== null)
+            ->groupBy(fn (Kehadiran $item) => $item->waktu->toDateString());
+
+        // Tanggal referensi diambil dari seluruh data kehadiran (group by tanggal waktu),
+        // lalu operator tanpa data pada tanggal tersebut dianggap tidak hadir.
+        $referenceDatesQuery = Kehadiran::query()
+            ->whereNotNull('waktu')
+            ->when($startDate !== '', fn (Builder $query) => $query->whereDate('waktu', '>=', $startDate))
+            ->when($endDate !== '', fn (Builder $query) => $query->whereDate('waktu', '<=', $endDate));
+
+        $referenceDates = $referenceDatesQuery
+            ->selectRaw('DATE(waktu) as tanggal')
+            ->distinct()
+            ->orderByDesc('tanggal')
+            ->pluck('tanggal');
+
+        if ($referenceDates->isEmpty()) {
+            $referenceDates = $attendanceRecords
                 ->filter(fn (Kehadiran $item) => $item->waktu !== null)
-                ->groupBy(fn (Kehadiran $item) => $item->waktu->toDateString());
+                ->map(fn (Kehadiran $item) => $item->waktu->toDateString())
+                ->unique()
+                ->sortDesc()
+                ->values();
+        }
 
-            // Tanggal referensi diambil dari seluruh data kehadiran (group by tanggal waktu),
-            // lalu operator tanpa data pada tanggal tersebut dianggap tidak hadir.
-            $referenceDates = Kehadiran::query()
-                ->whereNotNull('waktu')
-                ->when($startDate !== '', fn (Builder $query) => $query->whereDate('waktu', '>=', $startDate))
-                ->when($endDate !== '', fn (Builder $query) => $query->whereDate('waktu', '<=', $endDate))
-                ->selectRaw('DATE(waktu) as tanggal')
-                ->distinct()
-                ->orderByDesc('tanggal')
-                ->pluck('tanggal');
+        $attendanceRows = $referenceDates->map(function (string $dateKey) use ($groupedByDate): array {
+            $recordsInDate = $groupedByDate->get($dateKey, collect());
 
-            $attendanceRows = $referenceDates->map(function (string $dateKey) use ($groupedByDate): array {
-                $recordsInDate = $groupedByDate->get($dateKey, collect());
-
-                if ($recordsInDate->isEmpty()) {
-                    return [
-                        'waktu' => Carbon::parse($dateKey)->startOfDay(),
-                        'kegiatan_label' => '-',
-                        'hadir' => 0,
-                        'keterangan' => 'Tidak ada data operator pada tanggal ini.',
-                        'is_inferred' => true,
-                    ];
-                }
-
-                $isPresent = $recordsInDate->contains(fn (Kehadiran $item) => (int) ($item->hadir ?? 0) === 1);
-                $kegiatanLabel = $recordsInDate
-                    ->map(fn (Kehadiran $item) => $item->kegiatan?->nama_kegiatan)
-                    ->filter()
-                    ->unique()
-                    ->values()
-                    ->implode(', ');
-
-                $keterangan = $recordsInDate
-                    ->map(fn (Kehadiran $item) => trim((string) $item->keterangan))
-                    ->filter(fn (string $text) => $text !== '')
-                    ->values()
-                    ->implode(' | ');
-
+            if ($recordsInDate->isEmpty()) {
                 return [
                     'waktu' => Carbon::parse($dateKey)->startOfDay(),
-                    'kegiatan_label' => $kegiatanLabel !== '' ? $kegiatanLabel : '-',
-                    'hadir' => $isPresent ? 1 : 0,
-                    'keterangan' => $keterangan !== '' ? $keterangan : '-',
-                    'is_inferred' => false,
+                    'kegiatan_label' => '-',
+                    'hadir' => 0,
+                    'keterangan' => 'Tidak ada data operator pada tanggal ini.',
+                    'is_inferred' => true,
                 ];
-            })->values();
-        }
+            }
+
+            $isPresent = $recordsInDate->contains(fn (Kehadiran $item) => (int) ($item->hadir ?? 0) === 1);
+            $kegiatanLabel = $recordsInDate
+                ->map(fn (Kehadiran $item) => $item->kegiatan?->nama_kegiatan)
+                ->filter()
+                ->unique()
+                ->values()
+                ->implode(', ');
+
+            $keterangan = $recordsInDate
+                ->map(fn (Kehadiran $item) => trim((string) $item->keterangan))
+                ->filter(fn (string $text) => $text !== '')
+                ->values()
+                ->implode(' | ');
+
+            return [
+                'waktu' => Carbon::parse($dateKey)->startOfDay(),
+                'kegiatan_label' => $kegiatanLabel !== '' ? $kegiatanLabel : '-',
+                'hadir' => $isPresent ? 1 : 0,
+                'keterangan' => $keterangan !== '' ? $keterangan : '-',
+                'is_inferred' => false,
+            ];
+        })->values();
 
         $totalHadir = (int) $attendanceRows->filter(fn (array $row) => (int) $row['hadir'] === 1)->count();
         $totalTidakHadir = (int) $attendanceRows->filter(fn (array $row) => (int) $row['hadir'] !== 1)->count();
