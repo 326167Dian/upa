@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/operators', [OperatorController::class, 'store'])->middleware('feature:operators.create')->name('operators.store');
     Route::get('/operators/{operator}', [OperatorController::class, 'show'])->middleware('feature:operators.view')->name('operators.show');
     Route::get('/operators/{operator}/edit', [OperatorController::class, 'edit'])->middleware('feature:operators.edit')->name('operators.edit');
+    Route::get('/operators/{operator}/kehadiran', [OperatorController::class, 'personalAttendance'])->middleware('feature:kehadiran.view')->name('operators.personal-attendance');
     Route::match(['put', 'patch'], '/operators/{operator}', [OperatorController::class, 'update'])->middleware('feature:operators.edit')->name('operators.update');
     Route::delete('/operators/{operator}', [OperatorController::class, 'destroy'])->middleware('feature:operators.delete')->name('operators.destroy');
     Route::get('/operators/export/pdf', [OperatorController::class, 'exportPdf'])->middleware('feature:operators.view')->name('operators.exportPdf');

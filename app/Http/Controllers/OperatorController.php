@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Kehadiran;
 use App\Models\Operator;
 use App\Models\User;
 use App\Support\FeaturePermission;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -231,5 +233,137 @@ class OperatorController extends Controller
             'data' => $data,
             'filename' => 'data-operator-' . date('Y-m-d-H-i-s') . '.pdf'
         ]);
+    }
+
+    public function personalAttendance(Request $request, Operator $operator): View
+    {
+        $singleDate = trim((string) $request->query('tanggal', ''));
+        $startDate = trim((string) $request->query('tanggal_mulai', ''));
+        $endDate = trim((string) $request->query('tanggal_selesai', ''));
+
+        // Kompatibilitas URL lama: ?tanggal=YYYY-MM-DD dianggap satu hari.
+        if ($singleDate !== '' && $startDate === '' && $endDate === '') {
+            $startDate = $singleDate;
+            $endDate = $singleDate;
+        }
+
+        $startDate = $this->normalizeYmdDate($startDate);
+        $endDate = $this->normalizeYmdDate($endDate);
+
+        if ($startDate !== '' && $endDate !== '' && $startDate > $endDate) {
+            [$startDate, $endDate] = [$endDate, $startDate];
+        }
+
+        $filterDateLabel = '-';
+        if ($startDate !== '' && $endDate !== '') {
+            $filterDateLabel = Carbon::parse($startDate)->format('d M Y').' - '.Carbon::parse($endDate)->format('d M Y');
+        } elseif ($startDate !== '') {
+            $filterDateLabel = 'Mulai '.Carbon::parse($startDate)->format('d M Y');
+        } elseif ($endDate !== '') {
+            $filterDateLabel = 'Sampai '.Carbon::parse($endDate)->format('d M Y');
+        }
+
+        $attendanceRecords = Kehadiran::query()
+            ->with('kegiatan')
+            ->where('id', $operator->id)
+            ->when($startDate !== '', fn (Builder $query) => $query->whereDate('waktu', '>=', $startDate))
+            ->when($endDate !== '', fn (Builder $query) => $query->whereDate('waktu', '<=', $endDate))
+            ->orderByDesc('waktu')
+            ->get();
+
+        $attendanceRows = $attendanceRecords->map(function (Kehadiran $item): array {
+            return [
+                'waktu' => $item->waktu,
+                'kegiatan_label' => $item->kegiatan?->nama_kegiatan ?? '-',
+                'hadir' => (int) ($item->hadir ?? 0),
+                'keterangan' => $item->keterangan ?: '-',
+                'is_inferred' => false,
+            ];
+        })->values();
+
+        if ($startDate !== '' || $endDate !== '') {
+            $groupedByDate = $attendanceRecords
+                ->filter(fn (Kehadiran $item) => $item->waktu !== null)
+                ->groupBy(fn (Kehadiran $item) => $item->waktu->toDateString());
+
+            // Tanggal referensi diambil dari seluruh data kehadiran (group by tanggal waktu),
+            // lalu operator tanpa data pada tanggal tersebut dianggap tidak hadir.
+            $referenceDates = Kehadiran::query()
+                ->whereNotNull('waktu')
+                ->when($startDate !== '', fn (Builder $query) => $query->whereDate('waktu', '>=', $startDate))
+                ->when($endDate !== '', fn (Builder $query) => $query->whereDate('waktu', '<=', $endDate))
+                ->selectRaw('DATE(waktu) as tanggal')
+                ->distinct()
+                ->orderByDesc('tanggal')
+                ->pluck('tanggal');
+
+            $attendanceRows = $referenceDates->map(function (string $dateKey) use ($groupedByDate): array {
+                $recordsInDate = $groupedByDate->get($dateKey, collect());
+
+                if ($recordsInDate->isEmpty()) {
+                    return [
+                        'waktu' => Carbon::parse($dateKey)->startOfDay(),
+                        'kegiatan_label' => '-',
+                        'hadir' => 0,
+                        'keterangan' => 'Tidak ada data operator pada tanggal ini.',
+                        'is_inferred' => true,
+                    ];
+                }
+
+                $isPresent = $recordsInDate->contains(fn (Kehadiran $item) => (int) ($item->hadir ?? 0) === 1);
+                $kegiatanLabel = $recordsInDate
+                    ->map(fn (Kehadiran $item) => $item->kegiatan?->nama_kegiatan)
+                    ->filter()
+                    ->unique()
+                    ->values()
+                    ->implode(', ');
+
+                $keterangan = $recordsInDate
+                    ->map(fn (Kehadiran $item) => trim((string) $item->keterangan))
+                    ->filter(fn (string $text) => $text !== '')
+                    ->values()
+                    ->implode(' | ');
+
+                return [
+                    'waktu' => Carbon::parse($dateKey)->startOfDay(),
+                    'kegiatan_label' => $kegiatanLabel !== '' ? $kegiatanLabel : '-',
+                    'hadir' => $isPresent ? 1 : 0,
+                    'keterangan' => $keterangan !== '' ? $keterangan : '-',
+                    'is_inferred' => false,
+                ];
+            })->values();
+        }
+
+        $totalHadir = (int) $attendanceRows->filter(fn (array $row) => (int) $row['hadir'] === 1)->count();
+        $totalTidakHadir = (int) $attendanceRows->filter(fn (array $row) => (int) $row['hadir'] !== 1)->count();
+        $totalEvaluasi = $totalHadir + $totalTidakHadir;
+        $persentaseHadir = $totalEvaluasi > 0 ? round(($totalHadir / $totalEvaluasi) * 100, 1) : 0.0;
+
+        return view('operators.personal-attendance', [
+            'operator' => $operator,
+            'attendanceRows' => $attendanceRows,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'filterDateLabel' => $filterDateLabel,
+            'summaryStats' => [
+                'total_hadir' => $totalHadir,
+                'total_tidak_hadir' => $totalTidakHadir,
+                'total_evaluasi' => $totalEvaluasi,
+                'persentase_hadir' => $persentaseHadir,
+            ],
+        ]);
+    }
+
+    protected function normalizeYmdDate(string $date): string
+    {
+        if ($date === '') {
+            return '';
+        }
+
+        try {
+            return Carbon::createFromFormat('Y-m-d', $date)->toDateString();
+        } catch (\Throwable) {
+            return '';
+        }
     }
 }

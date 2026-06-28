@@ -85,12 +85,20 @@
                                     <td>{{ $operator->phone_number }}</td>
                                     <td>{{ \Illuminate\Support\Str::limit(trim(strip_tags($operator->full_address)), 90) }}</td>
                                     <td class="text-end">
-                                        @if (auth()->user()->hasFeatureAccess('operators.edit') || auth()->user()->hasFeatureAccess('operators.delete'))
+                                        @if (auth()->user()->hasFeatureAccess('kehadiran.view') || auth()->user()->hasFeatureAccess('operators.edit') || auth()->user()->hasFeatureAccess('operators.delete'))
                                             <div class="dropdown d-inline-block">
                                                 <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="operator-action-{{ $operator->id }}" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Aksi
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="operator-action-{{ $operator->id }}">
+                                                    @if (auth()->user()->hasFeatureAccess('kehadiran.view'))
+                                                        <li class="px-2 py-1">
+                                                            <a href="{{ route('operators.personal-attendance', $operator) }}" class="dropdown-item rounded d-flex align-items-center gap-2" style="background-color: #d9f3ff; color: #0b7285;">
+                                                                <i class="feather icon-calendar"></i>
+                                                                <span>Kehadiran Personal</span>
+                                                            </a>
+                                                        </li>
+                                                    @endif
                                                     @if (auth()->user()->hasFeatureAccess('operators.edit'))
                                                         <li class="px-2 py-1">
                                                             <a href="{{ route('operators.edit', $operator) }}" class="dropdown-item rounded d-flex align-items-center gap-2" style="background-color: #fff3bf; color: #7a4b00;">
