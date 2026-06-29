@@ -88,7 +88,6 @@ class DashboardController extends Controller
 
         $attendanceRecapRows = Operator::query()
             ->select('id', 'name')
-            ->whereNotIn('id', [33, 34])
             ->whereNotIn('user_id', [33, 34])
             ->orderBy('name')
             ->get()
