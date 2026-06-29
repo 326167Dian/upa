@@ -14,6 +14,13 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $recapStartDate = $this->normalizeYmdDate((string) $request->query('recap_tanggal_mulai', ''));
+        $recapEndDate = $this->normalizeYmdDate((string) $request->query('recap_tanggal_selesai', ''));
+
+        if ($recapStartDate !== '' && $recapEndDate !== '' && $recapStartDate > $recapEndDate) {
+            [$recapStartDate, $recapEndDate] = [$recapEndDate, $recapStartDate];
+        }
+
         $periodOptions = Kehadiran::query()
             ->whereNotNull('waktu')
             ->selectRaw("DATE_FORMAT(waktu, '%Y-%m') as period")
@@ -59,6 +66,72 @@ class DashboardController extends Controller
             ->values()
             ->toArray();
 
+        $recapReferenceDates = Kehadiran::query()
+            ->whereNotNull('waktu')
+            ->when($recapStartDate !== '', fn ($query) => $query->whereDate('waktu', '>=', $recapStartDate))
+            ->when($recapEndDate !== '', fn ($query) => $query->whereDate('waktu', '<=', $recapEndDate))
+            ->selectRaw('DATE(waktu) as tanggal')
+            ->distinct()
+            ->orderByDesc('tanggal')
+            ->pluck('tanggal')
+            ->values();
+
+        $attendanceGroupedByOperatorDate = Kehadiran::query()
+            ->whereNotNull('waktu')
+            ->when($recapStartDate !== '', fn ($query) => $query->whereDate('waktu', '>=', $recapStartDate))
+            ->when($recapEndDate !== '', fn ($query) => $query->whereDate('waktu', '<=', $recapEndDate))
+            ->select('id', 'hadir')
+            ->selectRaw('DATE(waktu) as tanggal')
+            ->get()
+            ->groupBy('id')
+            ->map(fn ($rows) => $rows->groupBy('tanggal'));
+
+        $attendanceRecapRows = Operator::query()
+            ->select('id', 'name')
+            ->whereNotIn('id', [33, 34])
+            ->whereNotIn('user_id', [33, 34])
+            ->orderBy('name')
+            ->get()
+            ->map(function (Operator $operator) use ($recapReferenceDates, $attendanceGroupedByOperatorDate): array {
+                $recordsByDate = $attendanceGroupedByOperatorDate->get($operator->id, collect());
+
+                $totalHadir = 0;
+                $totalTidakHadir = 0;
+
+                foreach ($recapReferenceDates as $dateKey) {
+                    $recordsInDate = $recordsByDate->get($dateKey, collect());
+
+                    if ($recordsInDate->isEmpty()) {
+                        $totalTidakHadir++;
+                        continue;
+                    }
+
+                    $isPresent = $recordsInDate->contains(fn ($item) => (int) ($item->hadir ?? 0) === 1);
+                    if ($isPresent) {
+                        $totalHadir++;
+                    } else {
+                        $totalTidakHadir++;
+                    }
+                }
+
+                return [
+                    'operator_id' => $operator->id,
+                    'operator_name' => $operator->name,
+                    'hadir' => $totalHadir,
+                    'tidak_hadir' => $totalTidakHadir,
+                ];
+            })
+            ->values();
+
+        $recapPeriodLabel = 'Semua periode';
+        if ($recapStartDate !== '' && $recapEndDate !== '') {
+            $recapPeriodLabel = Carbon::parse($recapStartDate)->format('d M Y').' - '.Carbon::parse($recapEndDate)->format('d M Y');
+        } elseif ($recapStartDate !== '') {
+            $recapPeriodLabel = 'Mulai '.Carbon::parse($recapStartDate)->format('d M Y');
+        } elseif ($recapEndDate !== '') {
+            $recapPeriodLabel = 'Sampai '.Carbon::parse($recapEndDate)->format('d M Y');
+        }
+
         // Absensi (tidak hadir) table
         $absensiDates = Kehadiran::query()
             ->where('hadir', 0)
@@ -98,9 +171,26 @@ class DashboardController extends Controller
             'selectedAttendancePeriod' => $selectedPeriod,
             'attendanceChartLabels' => $attendanceChartLabels,
             'attendanceChartValues' => $attendanceChartValues,
+            'attendanceRecapRows' => $attendanceRecapRows,
+            'attendanceRecapPeriodLabel' => $recapPeriodLabel,
+            'recapStartDate' => $recapStartDate,
+            'recapEndDate' => $recapEndDate,
             'absensiDates' => $absensiDates,
             'selectedAbsensiDate' => $selectedAbsensiDate,
             'absensiList' => $absensiList,
         ]);
+    }
+
+    protected function normalizeYmdDate(string $date): string
+    {
+        if ($date === '') {
+            return '';
+        }
+
+        try {
+            return Carbon::createFromFormat('Y-m-d', $date)->toDateString();
+        } catch (\Throwable) {
+            return '';
+        }
     }
 }

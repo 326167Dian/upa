@@ -47,6 +47,7 @@
         type="datetime-local"
         class="form-control @error('waktu') is-invalid @enderror"
         value="{{ old('waktu', optional($kehadiran->waktu)->format('Y-m-d\TH:i')) }}"
+        @if (! empty($minAttendanceDateTime)) min="{{ $minAttendanceDateTime }}" @endif
     >
     @error('waktu')
         <div class="invalid-feedback">{{ $message }}</div>

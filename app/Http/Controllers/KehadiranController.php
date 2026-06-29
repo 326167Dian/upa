@@ -133,6 +133,7 @@ class KehadiranController extends Controller
     public function create(): View
     {
         $currentOperator = $this->currentOperator(request());
+        $isAdmin = request()->user()?->role === User::ROLE_ADMIN;
 
         return view('kehadiran.create', [
             'kehadiran' => new Kehadiran(),
@@ -140,12 +141,13 @@ class KehadiranController extends Controller
             'currentOperator' => $currentOperator,
             'lockOperatorSelection' => $this->shouldLockOperatorSelection(request(), $currentOperator),
             'kegiatanList' => Kegiatan::orderBy('nama_kegiatan')->get(),
+            'minAttendanceDateTime' => $isAdmin ? null : now()->startOfDay()->format('Y-m-d\TH:i'),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        Kehadiran::create($this->validatedData($request));
+        Kehadiran::create($this->validatedData($request, true));
 
         return redirect()
             ->route('kehadiran.index')
@@ -167,7 +169,7 @@ class KehadiranController extends Controller
 
     public function update(Request $request, Kehadiran $kehadiran): RedirectResponse
     {
-        $kehadiran->update($this->validatedData($request));
+        $kehadiran->update($this->validatedData($request, false));
 
         return redirect()
             ->route('kehadiran.index')
@@ -186,9 +188,10 @@ class KehadiranController extends Controller
     /**
      * @return array<string, mixed>
      */
-    protected function validatedData(Request $request): array
+    protected function validatedData(Request $request, bool $isCreate = false): array
     {
         $currentOperator = $this->currentOperator($request);
+        $shouldBlockPastDate = $isCreate && $request->user()?->role !== User::ROLE_ADMIN;
 
         if ($this->shouldLockOperatorSelection($request, $currentOperator)) {
             $request->merge([
@@ -196,10 +199,23 @@ class KehadiranController extends Controller
             ]);
         }
 
+        $waktuRules = ['required', 'date'];
+        if ($shouldBlockPastDate) {
+            $waktuRules[] = function (string $attribute, mixed $value, \Closure $fail): void {
+                try {
+                    if (Carbon::parse((string) $value)->toDateString() < now()->toDateString()) {
+                        $fail('Selain admin, tanggal kehadiran tidak boleh kurang dari hari ini.');
+                    }
+                } catch (Throwable) {
+                    // Validation rule "date" already handles invalid formats.
+                }
+            };
+        }
+
         return $request->validate([
             'id' => ['required', 'exists:operators,id'],
             'id_kegiatan' => ['required', 'exists:kegiatan,id_kegiatan'],
-            'waktu' => ['required', 'date'],
+            'waktu' => $waktuRules,
             'hadir' => ['required', 'in:0,1'],
             'keterangan' => ['nullable', 'string'],
         ]);

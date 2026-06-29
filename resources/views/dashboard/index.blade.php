@@ -38,6 +38,15 @@
 
                             @if (count($attendancePeriodOptions) > 0)
                                 <form method="GET" action="{{ route('dashboard') }}" class="d-flex align-items-center gap-2">
+                                    @if ($recapStartDate)
+                                        <input type="hidden" name="recap_tanggal_mulai" value="{{ $recapStartDate }}">
+                                    @endif
+                                    @if ($recapEndDate)
+                                        <input type="hidden" name="recap_tanggal_selesai" value="{{ $recapEndDate }}">
+                                    @endif
+                                    @if ($selectedAbsensiDate)
+                                        <input type="hidden" name="absensi_date" value="{{ $selectedAbsensiDate }}">
+                                    @endif
                                     <label for="period" class="mb-0 text-muted">Pilih Waktu</label>
                                     <select id="period" name="period" class="form-select form-select-sm" onchange="this.form.submit()">
                                         @foreach ($attendancePeriodOptions as $period)
@@ -60,6 +69,88 @@
             </div>
         </div>
 
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                            <h4 class="mb-0">Rekap Kehadiran Operator</h4>
+                            <small class="text-muted">Periode: {{ $attendanceRecapPeriodLabel }}</small>
+                        </div>
+
+                        <form method="GET" action="{{ route('dashboard') }}" class="row g-2 align-items-end mb-3">
+                            @if ($selectedAttendancePeriod)
+                                <input type="hidden" name="period" value="{{ $selectedAttendancePeriod }}">
+                            @endif
+                            @if ($selectedAbsensiDate)
+                                <input type="hidden" name="absensi_date" value="{{ $selectedAbsensiDate }}">
+                            @endif
+                            <div class="col-md-4">
+                                <label for="recap_tanggal_mulai" class="form-label mb-1">Dari tanggal</label>
+                                <input
+                                    id="recap_tanggal_mulai"
+                                    name="recap_tanggal_mulai"
+                                    type="date"
+                                    value="{{ $recapStartDate }}"
+                                    class="form-control form-control-sm"
+                                >
+                            </div>
+                            <div class="col-md-4">
+                                <label for="recap_tanggal_selesai" class="form-label mb-1">Sampai tanggal</label>
+                                <input
+                                    id="recap_tanggal_selesai"
+                                    name="recap_tanggal_selesai"
+                                    type="date"
+                                    value="{{ $recapEndDate }}"
+                                    class="form-control form-control-sm"
+                                >
+                            </div>
+                            <div class="col-md-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm">Filter Rekap</button>
+                                <a href="{{ route('dashboard', array_filter([
+                                    'period' => $selectedAttendancePeriod ?: null,
+                                    'absensi_date' => $selectedAbsensiDate ?: null,
+                                ])) }}" class="btn btn-light border btn-sm">Reset</a>
+                            </div>
+                        </form>
+
+                        @if ($attendanceRecapRows->isNotEmpty())
+                            <table class="table table-bordered table-sm">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 60px;">No.</th>
+                                        <th>Nama</th>
+                                        <th style="width: 140px;" class="text-center">Hadir</th>
+                                        <th style="width: 140px;" class="text-center">Tidak hadir</th>
+                                        <th style="width: 120px;" class="text-center">Detail</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($attendanceRecapRows as $index => $row)
+                                        <tr>
+                                            <td class="text-center">{{ $index + 1 }}</td>
+                                            <td>{{ $row['operator_name'] }}</td>
+                                            <td class="text-center">{{ $row['hadir'] }}</td>
+                                            <td class="text-center {{ $row['tidak_hadir'] > 4 ? 'text-danger font-weight-bold' : '' }}">{{ $row['tidak_hadir'] }}</td>
+                                            <td class="text-center">
+                                                <a href="{{ route('operators.personal-attendance', array_filter([
+                                                    'operator' => $row['operator_id'],
+                                                    'tanggal_mulai' => $recapStartDate ?: null,
+                                                    'tanggal_selesai' => $recapEndDate ?: null,
+                                                ])) }}">(show)</a>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        @else
+                            <p class="text-muted mb-0">Belum ada operator untuk ditampilkan.</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {{-- Absensi UPA --}}
         <div class="row mt-4">
             <div class="col-12">
@@ -71,6 +162,12 @@
                             <form method="GET" action="{{ route('dashboard') }}" class="d-flex align-items-center gap-2 mb-3">
                                 @if ($selectedAttendancePeriod)
                                     <input type="hidden" name="period" value="{{ $selectedAttendancePeriod }}">
+                                @endif
+                                @if ($recapStartDate)
+                                    <input type="hidden" name="recap_tanggal_mulai" value="{{ $recapStartDate }}">
+                                @endif
+                                @if ($recapEndDate)
+                                    <input type="hidden" name="recap_tanggal_selesai" value="{{ $recapEndDate }}">
                                 @endif
                                 <label for="absensi_date" class="mb-0 text-muted text-nowrap">Filter Tanggal</label>
                                 <select id="absensi_date" name="absensi_date" class="form-select form-select-sm" style="max-width: 220px;" onchange="this.form.submit()">
