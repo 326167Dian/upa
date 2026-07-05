@@ -12,6 +12,11 @@
         $espireAsset = fn (string $path) => url(str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path)));
         $profileOperator = auth()->user()?->operator;
         $profileAvatar = $profileOperator?->avatar_path ? asset('storage/'.$profileOperator->avatar_path) : asset('images/cakep.png');
+        $layoutUserAgent = (string) request()->header('User-Agent', '');
+        $isMobileClient = (bool) preg_match('/Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile/i', $layoutUserAgent);
+        $preferredDashboardMode = (string) session('dashboard_mode', '');
+        $switchToDesktopUrl = route('dashboard', ['mode' => 'desktop']);
+        $switchToMobileUrl = route('dashboard', ['mode' => 'mobile']);
     @endphp
 
     <link rel="shortcut icon" href="{{ $espireAsset('images/logo/favicon.ico') }}">
@@ -167,6 +172,16 @@
                         </div>
                     </div>
                     <div class="header-nav-right">
+                        @if ($isMobileClient)
+                            <div class="header-nav-item">
+                                <a
+                                    href="{{ $preferredDashboardMode === 'desktop' ? $switchToMobileUrl : $switchToDesktopUrl }}"
+                                    class="btn btn-sm btn-outline-primary"
+                                >
+                                    {{ $preferredDashboardMode === 'desktop' ? 'Mode HP' : 'Mode Desktop' }}
+                                </a>
+                            </div>
+                        @endif
                         <div class="header-nav-item">
                             <div class="dropdown header-nav-item-select nav-profile">
                                 <div class="toggle-wrapper" id="nav-profile-dropdown" data-bs-toggle="dropdown">
@@ -195,6 +210,14 @@
                                             <span>Edit Profile</span>
                                         </div>
                                     </a>
+                                    @if ($isMobileClient)
+                                        <a href="{{ $preferredDashboardMode === 'desktop' ? $switchToMobileUrl : $switchToDesktopUrl }}" class="dropdown-item">
+                                            <div class="d-flex align-items-center">
+                                                <i class="font-size-lg me-2 feather {{ $preferredDashboardMode === 'desktop' ? 'icon-smartphone' : 'icon-monitor' }}"></i>
+                                                <span>{{ $preferredDashboardMode === 'desktop' ? 'Beralih ke Tampilan HP' : 'Beralih ke Tampilan Desktop' }}</span>
+                                            </div>
+                                        </a>
+                                    @endif
                                     <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit" class="dropdown-item border-0 bg-transparent w-100 text-start">

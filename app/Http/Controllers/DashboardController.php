@@ -14,6 +14,23 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        $userAgent = (string) $request->header('User-Agent', '');
+        $isMobileClient = (bool) preg_match('/Android|iPhone|iPad|iPod|IEMobile|Opera Mini|Mobile/i', $userAgent);
+
+        $requestedMode = (string) $request->query('mode', '');
+        if (in_array($requestedMode, ['mobile', 'desktop'], true)) {
+            $request->session()->put('dashboard_mode', $requestedMode);
+        }
+
+        $preferredMode = (string) $request->session()->get('dashboard_mode', '');
+        $useMobileDashboard = $isMobileClient;
+
+        if ($preferredMode === 'desktop') {
+            $useMobileDashboard = false;
+        } elseif ($preferredMode === 'mobile') {
+            $useMobileDashboard = true;
+        }
+
         $recapStartDate = $this->normalizeYmdDate((string) $request->query('recap_tanggal_mulai', ''));
         $recapEndDate = $this->normalizeYmdDate((string) $request->query('recap_tanggal_selesai', ''));
 
@@ -156,7 +173,7 @@ class DashboardController extends Controller
                 ->get();
         }
 
-        return view('dashboard.index', [
+        return view($useMobileDashboard ? 'dashboard.mobile' : 'dashboard.index', [
             'operatorCount' => Operator::count(),
             'adminCount' => Operator::where('role', 'admin')->count(),
             'userCount' => Operator::where('role', 'user')->count(),
@@ -177,6 +194,8 @@ class DashboardController extends Controller
             'absensiDates' => $absensiDates,
             'selectedAbsensiDate' => $selectedAbsensiDate,
             'absensiList' => $absensiList,
+            'isMobileClient' => $isMobileClient,
+            'useMobileDashboard' => $useMobileDashboard,
         ]);
     }
 
@@ -188,7 +207,7 @@ class DashboardController extends Controller
 
         try {
             return Carbon::createFromFormat('Y-m-d', $date)->toDateString();
-        } catch (\Throwable) {
+        } catch (\Throwable $exception) {
             return '';
         }
     }

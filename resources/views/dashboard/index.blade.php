@@ -2,8 +2,13 @@
 
 @section('content')
     <div class="main">
-        <div class="page-header no-gutters has-tab">
-            <h2 class="font-weight-normal">Dashboard</h2>
+        <div class="page-header no-gutters has-tab d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h2 class="font-weight-normal mb-0">Dashboard</h2>
+            @if (!empty($isMobileClient))
+                <a href="{{ route('dashboard', array_merge(request()->except('mode'), ['mode' => 'mobile'])) }}" class="btn btn-outline-primary btn-sm">
+                    Pindah ke Tampilan HP
+                </a>
+            @endif
         </div>
 
         <div class="row mt-4">
