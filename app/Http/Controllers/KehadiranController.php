@@ -205,6 +205,115 @@ class KehadiranController extends Controller
             ->with('success', 'Data kehadiran massal berhasil ditambahkan untuk '.count($operatorIds).' operator.');
     }
 
+    public function massUpdateAdmin(Request $request): View
+    {
+        $this->abortIfNotAdmin($request);
+
+        $validated = $request->validate([
+            'id_kegiatan' => ['nullable', 'exists:kegiatan,id_kegiatan'],
+            'tanggal' => ['nullable', 'date'],
+        ]);
+
+        $selectedKegiatanId = (string) ($validated['id_kegiatan'] ?? '');
+        $selectedDate = (string) ($validated['tanggal'] ?? now()->toDateString());
+        $operators = Operator::orderBy('name')->get();
+        $existingRows = collect();
+        $checkedOperatorIds = [];
+        $defaultLokasi = '';
+        $defaultKeterangan = '';
+
+        if ($selectedKegiatanId !== '') {
+            $existingRows = Kehadiran::query()
+                ->where('id_kegiatan', (int) $selectedKegiatanId)
+                ->whereDate('waktu', $selectedDate)
+                ->latest('id_kehadiran')
+                ->get()
+                ->unique('id')
+                ->values();
+
+            $checkedOperatorIds = $existingRows
+                ->where('hadir', 1)
+                ->pluck('id')
+                ->map(fn (int $operatorId): string => (string) $operatorId)
+                ->all();
+
+            $latestRow = $existingRows->first();
+            if ($latestRow !== null) {
+                $defaultLokasi = (string) ($latestRow->lokasi ?? '');
+                $defaultKeterangan = (string) ($latestRow->keterangan ?? '');
+            }
+        }
+
+        return view('kehadiran.mass-update-admin', [
+            'operators' => $operators,
+            'kegiatanList' => Kegiatan::orderBy('nama_kegiatan')->get(),
+            'selectedKegiatanId' => $selectedKegiatanId,
+            'selectedDate' => $selectedDate,
+            'checkedOperatorIds' => $checkedOperatorIds,
+            'defaultTime' => now()->format('H:i'),
+            'defaultLokasi' => $defaultLokasi,
+            'defaultKeterangan' => $defaultKeterangan,
+        ]);
+    }
+
+    public function processMassUpdateAdmin(Request $request): RedirectResponse
+    {
+        $this->abortIfNotAdmin($request);
+
+        $validated = $request->validate([
+            'id_kegiatan' => ['required', 'exists:kegiatan,id_kegiatan'],
+            'tanggal' => ['required', 'date'],
+            'jam' => ['required', 'date_format:H:i'],
+            'lokasi' => ['required', 'string', 'max:255'],
+            'keterangan' => ['nullable', 'string'],
+            'selected_operators' => ['nullable', 'array'],
+            'selected_operators.*' => ['required', 'distinct', 'exists:operators,id'],
+        ]);
+
+        $selectedOperatorIds = collect($validated['selected_operators'] ?? [])
+            ->map(fn (string|int $operatorId): int => (int) $operatorId)
+            ->unique()
+            ->values();
+        $selectedOperatorLookup = array_fill_keys($selectedOperatorIds->all(), true);
+        $allOperatorIds = Operator::query()->orderBy('id')->pluck('id')->map(fn (int $operatorId): int => (int) $operatorId);
+        $attendanceDateTime = Carbon::createFromFormat('Y-m-d H:i', $validated['tanggal'].' '.$validated['jam']);
+        $keterangan = trim((string) ($validated['keterangan'] ?? ''));
+
+        DB::transaction(function () use ($allOperatorIds, $selectedOperatorLookup, $validated, $attendanceDateTime, $keterangan): void {
+            foreach ($allOperatorIds as $operatorId) {
+                $payload = [
+                    'id' => $operatorId,
+                    'id_kegiatan' => (int) $validated['id_kegiatan'],
+                    'waktu' => $attendanceDateTime,
+                    'lokasi' => (string) $validated['lokasi'],
+                    'hadir' => isset($selectedOperatorLookup[$operatorId]) ? 1 : 0,
+                    'keterangan' => $keterangan !== '' ? $keterangan : null,
+                ];
+
+                $latestRow = Kehadiran::query()
+                    ->where('id', $operatorId)
+                    ->where('id_kegiatan', (int) $validated['id_kegiatan'])
+                    ->whereDate('waktu', $validated['tanggal'])
+                    ->latest('id_kehadiran')
+                    ->first();
+
+                if ($latestRow) {
+                    $latestRow->update($payload);
+                    continue;
+                }
+
+                Kehadiran::create($payload);
+            }
+        });
+
+        return redirect()
+            ->route('kehadiran.admin.mass-update', [
+                'id_kegiatan' => $validated['id_kegiatan'],
+                'tanggal' => $validated['tanggal'],
+            ])
+            ->with('success', 'Update massal kehadiran berhasil. Hadir: '.$selectedOperatorIds->count().' operator.');
+    }
+
     public function edit(Kehadiran $kehadiran): View
     {
         $currentOperator = $this->currentOperator(request());

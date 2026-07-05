@@ -8,6 +8,7 @@
                 <div class="d-flex gap-2">
                     @if (auth()->user()?->hasFeatureAccess('kehadiran.create') && auth()->user()?->role === \App\Models\User::ROLE_ADMIN)
                         <a href="{{ route('kehadiran.admin.create') }}" class="btn btn-outline-primary">Input Massal Admin</a>
+                        <a href="{{ route('kehadiran.admin.mass-update') }}" class="btn btn-outline-warning">Update Massal Admin</a>
                     @endif
                     @if (auth()->user()?->hasFeatureAccess('kehadiran.create'))
                         <a href="{{ route('kehadiran.create') }}" class="btn btn-primary">Tambah Kehadiran</a>

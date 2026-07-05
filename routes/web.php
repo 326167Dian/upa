@@ -53,8 +53,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/kehadiran/export', [KehadiranController::class, 'export'])->middleware('feature:kehadiran.view')->name('kehadiran.export');
     Route::get('/kehadiran/create', [KehadiranController::class, 'create'])->middleware('feature:kehadiran.create')->name('kehadiran.create');
     Route::get('/kehadiran/admin/create', [KehadiranController::class, 'createAdmin'])->middleware('feature:kehadiran.create')->name('kehadiran.admin.create');
+    Route::get('/kehadiran/admin/mass-update', [KehadiranController::class, 'massUpdateAdmin'])->middleware('feature:kehadiran.create')->name('kehadiran.admin.mass-update');
     Route::post('/kehadiran', [KehadiranController::class, 'store'])->middleware('feature:kehadiran.create')->name('kehadiran.store');
     Route::post('/kehadiran/admin', [KehadiranController::class, 'storeAdmin'])->middleware('feature:kehadiran.create')->name('kehadiran.admin.store');
+    Route::post('/kehadiran/admin/mass-update', [KehadiranController::class, 'processMassUpdateAdmin'])->middleware('feature:kehadiran.create')->name('kehadiran.admin.mass-update.process');
     Route::get('/kehadiran/{kehadiran}/edit', [KehadiranController::class, 'edit'])->middleware('feature:kehadiran.edit')->name('kehadiran.edit');
     Route::match(['put', 'patch'], '/kehadiran/{kehadiran}', [KehadiranController::class, 'update'])->middleware('feature:kehadiran.edit')->name('kehadiran.update');
     Route::delete('/kehadiran/{kehadiran}', [KehadiranController::class, 'destroy'])->middleware('feature:kehadiran.delete')->name('kehadiran.destroy');
