@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -65,7 +66,7 @@ class KehadiranController extends Controller
 
         try {
             $xlsxPath = SimpleXlsxWriter::create(
-                ['Operator', 'Kegiatan', 'Waktu', 'Status', 'Keterangan'],
+                ['Operator', 'Kegiatan', 'Waktu', 'Lokasi', 'Status', 'Keterangan'],
                 $rows
             );
 
@@ -95,6 +96,7 @@ class KehadiranController extends Controller
                 $item->operator?->name ?? '-',
                 $item->kegiatan?->nama_kegiatan ?? '-',
                 $item->waktu?->format('Y-m-d H:i:s') ?? '-',
+                $item->lokasi ?? '-',
                 $item->hadir === 1 ? 'Hadir' : 'Tidak Hadir',
                 $item->keterangan ?: '-',
             ];
@@ -118,7 +120,7 @@ class KehadiranController extends Controller
             // UTF-8 BOM so Excel reads Indonesian characters correctly.
             fwrite($handle, "\xEF\xBB\xBF");
 
-            fputcsv($handle, ['Operator', 'Kegiatan', 'Waktu', 'Status', 'Keterangan']);
+            fputcsv($handle, ['Operator', 'Kegiatan', 'Waktu', 'Lokasi', 'Status', 'Keterangan']);
 
             foreach ($rows as $row) {
                 fputcsv($handle, $row);
@@ -145,6 +147,17 @@ class KehadiranController extends Controller
         ]);
     }
 
+    public function createAdmin(Request $request): View
+    {
+        $this->abortIfNotAdmin($request);
+
+        return view('kehadiran.create-admin', [
+            'operators' => Operator::orderBy('name')->get(),
+            'kegiatanList' => Kegiatan::orderBy('nama_kegiatan')->get(),
+            'defaultAttendanceDateTime' => now()->format('Y-m-d\TH:i'),
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         Kehadiran::create($this->validatedData($request, true));
@@ -152,6 +165,44 @@ class KehadiranController extends Controller
         return redirect()
             ->route('kehadiran.index')
             ->with('success', 'Data kehadiran berhasil ditambahkan.');
+    }
+
+    public function storeAdmin(Request $request): RedirectResponse
+    {
+        $this->abortIfNotAdmin($request);
+
+        $validated = $request->validate([
+            'id_kegiatan' => ['required', 'exists:kegiatan,id_kegiatan'],
+            'waktu' => ['required', 'date'],
+            'lokasi' => ['required', 'string', 'max:255'],
+            'keterangan' => ['nullable', 'string'],
+            'selected_operators' => ['required', 'array', 'min:1'],
+            'selected_operators.*' => ['required', 'distinct', 'exists:operators,id'],
+        ], [
+            'selected_operators.required' => 'Pilih minimal satu operator yang hadir.',
+            'selected_operators.min' => 'Pilih minimal satu operator yang hadir.',
+        ]);
+
+        $operatorIds = array_map('intval', $validated['selected_operators']);
+        $waktu = Carbon::parse((string) $validated['waktu']);
+        $keterangan = (string) ($validated['keterangan'] ?? '');
+
+        DB::transaction(function () use ($operatorIds, $validated, $waktu, $keterangan): void {
+            foreach ($operatorIds as $operatorId) {
+                Kehadiran::create([
+                    'id' => $operatorId,
+                    'id_kegiatan' => (int) $validated['id_kegiatan'],
+                    'waktu' => $waktu,
+                    'lokasi' => (string) $validated['lokasi'],
+                    'hadir' => 1,
+                    'keterangan' => $keterangan !== '' ? $keterangan : null,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('kehadiran.index')
+            ->with('success', 'Data kehadiran massal berhasil ditambahkan untuk '.count($operatorIds).' operator.');
     }
 
     public function edit(Kehadiran $kehadiran): View
@@ -216,6 +267,7 @@ class KehadiranController extends Controller
             'id' => ['required', 'exists:operators,id'],
             'id_kegiatan' => ['required', 'exists:kegiatan,id_kegiatan'],
             'waktu' => $waktuRules,
+            'lokasi' => ['nullable', 'string', 'max:255'],
             'hadir' => ['required', 'in:0,1'],
             'keterangan' => ['nullable', 'string'],
         ]);
@@ -243,5 +295,10 @@ class KehadiranController extends Controller
     protected function shouldLockOperatorSelection(Request $request, ?Operator $operator): bool
     {
         return $request->user()?->role !== User::ROLE_ADMIN && $operator !== null;
+    }
+
+    protected function abortIfNotAdmin(Request $request): void
+    {
+        abort_if($request->user()?->role !== User::ROLE_ADMIN, 403);
     }
 }

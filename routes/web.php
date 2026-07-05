@@ -52,7 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/kehadiran', [KehadiranController::class, 'index'])->middleware('feature:kehadiran.view')->name('kehadiran.index');
     Route::get('/kehadiran/export', [KehadiranController::class, 'export'])->middleware('feature:kehadiran.view')->name('kehadiran.export');
     Route::get('/kehadiran/create', [KehadiranController::class, 'create'])->middleware('feature:kehadiran.create')->name('kehadiran.create');
+    Route::get('/kehadiran/admin/create', [KehadiranController::class, 'createAdmin'])->middleware('feature:kehadiran.create')->name('kehadiran.admin.create');
     Route::post('/kehadiran', [KehadiranController::class, 'store'])->middleware('feature:kehadiran.create')->name('kehadiran.store');
+    Route::post('/kehadiran/admin', [KehadiranController::class, 'storeAdmin'])->middleware('feature:kehadiran.create')->name('kehadiran.admin.store');
     Route::get('/kehadiran/{kehadiran}/edit', [KehadiranController::class, 'edit'])->middleware('feature:kehadiran.edit')->name('kehadiran.edit');
     Route::match(['put', 'patch'], '/kehadiran/{kehadiran}', [KehadiranController::class, 'update'])->middleware('feature:kehadiran.edit')->name('kehadiran.update');
     Route::delete('/kehadiran/{kehadiran}', [KehadiranController::class, 'destroy'])->middleware('feature:kehadiran.delete')->name('kehadiran.destroy');

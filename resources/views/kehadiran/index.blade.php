@@ -5,9 +5,14 @@
         <div class="page-header no-gutters has-tab">
             <div class="d-md-flex align-items-center justify-content-between w-100">
                 <h2 class="font-weight-normal mb-3 mb-md-0">Data Kehadiran</h2>
-                @if (auth()->user()?->hasFeatureAccess('kehadiran.create'))
-                    <a href="{{ route('kehadiran.create') }}" class="btn btn-primary">Tambah Kehadiran</a>
-                @endif
+                <div class="d-flex gap-2">
+                    @if (auth()->user()?->hasFeatureAccess('kehadiran.create') && auth()->user()?->role === \App\Models\User::ROLE_ADMIN)
+                        <a href="{{ route('kehadiran.admin.create') }}" class="btn btn-outline-primary">Input Massal Admin</a>
+                    @endif
+                    @if (auth()->user()?->hasFeatureAccess('kehadiran.create'))
+                        <a href="{{ route('kehadiran.create') }}" class="btn btn-primary">Tambah Kehadiran</a>
+                    @endif
+                </div>
             </div>
         </div>
 
@@ -53,6 +58,7 @@
                                 <th>Operator</th>
                                 <th>Kegiatan</th>
                                 <th>Waktu</th>
+                                <th>Lokasi</th>
                                 <th>Status</th>
                                 <th>Keterangan</th>
                                 <th class="text-end">Aksi</th>
@@ -72,6 +78,7 @@
                                             -
                                         @endif
                                     </td>
+                                    <td>{{ $item->lokasi ?: '-' }}</td>
                                     <td>
                                         <span class="badge {{ $item->hadir === 1 ? 'bg-success' : 'bg-danger' }}">
                                             {{ $item->hadir === 1 ? 'Hadir' : 'Tidak Hadir' }}
@@ -112,7 +119,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
+                                    <td colspan="7" class="text-center text-muted">
                                         @if ($selectedDate)
                                             Tidak ada data kehadiran pada tanggal {{ \Carbon\Carbon::parse($selectedDate)->format('d M Y') }}.
                                         @else

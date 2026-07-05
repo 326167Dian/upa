@@ -55,6 +55,21 @@
 </div>
 
 <div class="mb-3">
+    <label for="lokasi" class="form-label">Lokasi</label>
+    <input
+        id="lokasi"
+        name="lokasi"
+        type="text"
+        class="form-control @error('lokasi') is-invalid @enderror"
+        value="{{ old('lokasi', $kehadiran->lokasi) }}"
+        placeholder="Contoh: Aula UPA"
+    >
+    @error('lokasi')
+        <div class="invalid-feedback">{{ $message }}</div>
+    @enderror
+</div>
+
+<div class="mb-3">
     <label for="hadir" class="form-label">Status Kehadiran</label>
     <select id="hadir" name="hadir" class="form-select @error('hadir') is-invalid @enderror">
         <option value="">Pilih status</option>

@@ -17,6 +17,7 @@ class Kehadiran extends Model
         'id',
         'id_kegiatan',
         'waktu',
+        'lokasi',
         'hadir',
         'keterangan',
     ];
