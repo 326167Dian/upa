@@ -12,9 +12,11 @@
     <title>Dashboard Mobile</title>
 
     @php
-        $mobileAsset = fn (string $path) => asset('Mobilekit/HTML/assets/'.$path);
+        $publicBasePath = trim((string) request()->getBaseUrl(), '/');
+        $publicPrefix = $publicBasePath === '' ? '' : '/'.$publicBasePath;
+        $mobileAsset = fn (string $path) => $publicPrefix.'/Mobilekit/HTML/assets/'.$path;
         $espireBase = 'Espire/espireadmin-10/Espire - Bootstrap Admin Template/html/demo/app';
-        $espireAsset = fn (string $path) => url(str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path)));
+        $espireAsset = fn (string $path) => $publicPrefix.'/'.str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path));
         $operator = auth()->user()?->operator;
         $avatar = $operator?->avatar_path ? asset('storage/'.$operator->avatar_path) : asset('images/cakep.png');
     @endphp

@@ -6,8 +6,10 @@
     <title>{{ $title ?? 'Login' }}</title>
 
     @php
+        $publicBasePath = trim((string) request()->getBaseUrl(), '/');
+        $publicPrefix = $publicBasePath === '' ? '' : '/'.$publicBasePath;
         $espireBase = 'Espire/espireadmin-10/Espire - Bootstrap Admin Template/html/demo/app';
-        $espireAsset = fn (string $path) => url(str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path)));
+        $espireAsset = fn (string $path) => $publicPrefix.'/'.str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path));
     @endphp
 
     <link rel="shortcut icon" href="{{ $espireAsset('images/logo/favicon.ico') }}">

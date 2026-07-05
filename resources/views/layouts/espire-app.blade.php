@@ -8,8 +8,10 @@
     <title>{{ $title ?? 'Dashboard' }}</title>
 
     @php
+        $publicBasePath = trim((string) request()->getBaseUrl(), '/');
+        $publicPrefix = $publicBasePath === '' ? '' : '/'.$publicBasePath;
         $espireBase = 'Espire/espireadmin-10/Espire - Bootstrap Admin Template/html/demo/app';
-        $espireAsset = fn (string $path) => url(str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path)));
+        $espireAsset = fn (string $path) => $publicPrefix.'/'.str_replace('%2F', '/', rawurlencode($espireBase.'/assets/'.$path));
         $profileOperator = auth()->user()?->operator;
         $profileAvatar = $profileOperator?->avatar_path ? asset('storage/'.$profileOperator->avatar_path) : asset('images/cakep.png');
         $layoutUserAgent = (string) request()->header('User-Agent', '');
