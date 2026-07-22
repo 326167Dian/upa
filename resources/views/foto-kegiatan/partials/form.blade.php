@@ -13,8 +13,8 @@
 
 <div class="mb-3">
     <label for="foto" class="form-label">Foto</label>
-    <input id="foto" name="foto" type="file" accept="image/*" class="form-control @error('foto') is-invalid @enderror">
-    <small class="text-muted">Upload foto maksimal 1 MB.</small>
+    <input id="foto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" class="form-control @error('foto') is-invalid @enderror">
+    <small class="text-muted">Format JPG, PNG, atau WEBP. Maksimal 2 MB.</small>
     @error('foto')
         <div class="invalid-feedback d-block">{{ $message }}</div>
     @enderror
